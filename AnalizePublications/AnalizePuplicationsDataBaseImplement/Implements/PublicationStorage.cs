@@ -78,5 +78,19 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             context.SaveChanges();
             return entity.GetViewModel;
         }
+
+        public List<PublicationViewModel> GetPublicationsByAuthor(int authorId)
+        {
+            using var context = new PublicationsDatabase();
+
+            return context.Publications
+                .Include(p => p.Source)
+                .Include(p => p.PublicationAuthors)
+                .Where(p => p.PublicationAuthors
+                    .Any(pa => pa.AuthorId == authorId))
+                .Select(p => p.GetViewModel)
+                .ToList();
+        }
+
     }
 }

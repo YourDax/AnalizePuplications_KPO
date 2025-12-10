@@ -3,7 +3,6 @@ using AnalyzePublicationsContracts.ViewModels;
 using AnalyzePublicationsDataModels.Models;
 using AnalyzePublicationsDataModels.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnalyzePublicationsDatabaseImplement.Models
 {
@@ -23,14 +22,14 @@ namespace AnalyzePublicationsDatabaseImplement.Models
 
         // Foreign key
         public int SourceId { get; set; }
-        public virtual Source Source { get; set; } = new();
+        public virtual Source? Source { get; set; }
 
         public string? Doi { get; set; }
 
         [Required]
         public int CitationCount { get; set; }
 
-        // Навигационные свойства
+        // Навигация для many-to-many
         public virtual List<PublicationAuthor> PublicationAuthors { get; set; } = new();
 
         // ---------------- Methods ----------------
@@ -38,9 +37,9 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         public static Publication? Create(PublicationBindingModel model)
         {
             if (model == null) return null;
+
             return new Publication
             {
-                Id = model.Id,
                 Title = model.Title,
                 Year = model.Year,
                 PublicationType = model.PublicationType,
@@ -53,6 +52,7 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         public void Update(PublicationBindingModel model)
         {
             if (model == null) return;
+
             Title = model.Title;
             Year = model.Year;
             PublicationType = model.PublicationType;
