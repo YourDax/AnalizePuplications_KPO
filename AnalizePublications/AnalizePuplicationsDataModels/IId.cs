@@ -1,7 +1,7 @@
 ﻿namespace AnalizePuplicationsDataModels
 {
-    public class Class1
+    public interface IId
     {
-
+        int Id { get; }
     }
 }
