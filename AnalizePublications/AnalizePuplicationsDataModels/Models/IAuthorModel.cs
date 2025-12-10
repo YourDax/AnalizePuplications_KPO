@@ -22,9 +22,33 @@ namespace AnalyzePublicationsDataModels.Models
         /// </summary>
         string Email { get; }
 
+        // ---------------------
+        // Метрики автора
+        // ---------------------
+
         /// <summary>
-        /// Дата добавления автора
+        /// Количество публикаций
         /// </summary>
-        DateTime DateCreated { get; }
+        int PublicationsCount { get; }
+
+        /// <summary>
+        /// Количество соавторов
+        /// </summary>
+        int CoauthorsCount { get; }
+
+        /// <summary>
+        /// Количество цитирований всех публикаций автора
+        /// </summary>
+        int CitationCount { get; }
+
+        /// <summary>
+        /// Индекс Хирша (H-индекс)
+        /// </summary>
+        int HIndex { get; }
+
+        /// <summary>
+        /// Среднее число страниц в публикации.
+        /// </summary>
+        double AveragePages { get; }
     }
 }

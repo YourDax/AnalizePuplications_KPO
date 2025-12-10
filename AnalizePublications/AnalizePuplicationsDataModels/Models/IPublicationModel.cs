@@ -38,10 +38,5 @@ namespace AnalyzePublicationsDataModels.Models
         /// Вводится вручную пользователем.
         /// </summary>
         int CitationCount { get; }
-
-        /// <summary>
-        /// Дата добавления записи в систему
-        /// </summary>
-        DateTime DateCreated { get; }
     }
 }

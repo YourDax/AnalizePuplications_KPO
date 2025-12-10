@@ -23,10 +23,5 @@ namespace AnalyzePublicationsDataModels.Models
         /// Тип источника
         /// </summary>
         SourceType SourceType { get; }
-
-        /// <summary>
-        /// Дата добавления источника
-        /// </summary>
-        DateTime DateCreated { get; }
     }
 }
