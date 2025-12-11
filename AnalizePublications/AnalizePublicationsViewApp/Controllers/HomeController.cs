@@ -1,32 +1,27 @@
-using System.Diagnostics;
-using AnalizePublicationsViewApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using AnalizePuplicationsContracts.BusinessLogicContracts;
 
-namespace AnalizePublicationsViewApp.Controllers
+namespace AnalyzePublicationsWeb.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IAuthorLogic _authorLogic;
+        private readonly IPublicationLogic _publicationLogic;
+        private readonly ISourceLogic _sourceLogic;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            IAuthorLogic authorLogic,
+            IPublicationLogic publicationLogic,
+            ISourceLogic sourceLogic)
         {
-            _logger = logger;
+            _authorLogic = authorLogic;
+            _publicationLogic = publicationLogic;
+            _sourceLogic = sourceLogic;
         }
 
         public IActionResult Index()
         {
             return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

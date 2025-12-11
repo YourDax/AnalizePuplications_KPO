@@ -1,0 +1,19 @@
+﻿@model AnalyzePublicationsContracts.ViewModels.PublicationViewModel
+
+<h2>Удалить публикацию</h2>
+
+<p>Вы уверены, что хотите удалить публикацию <strong>@Model.Title</strong>?</p>
+
+<ul>
+    <li><strong>Год:</strong> @Model.Year</li>
+    <li><strong>Тип:</strong> @Model.PublicationType</li>
+    <li><strong>Источник Id:</strong> @Model.SourceId</li>
+    <li><strong>DOI:</strong> @Model.Doi</li>
+    <li><strong>Цитирования:</strong> @Model.CitationCount</li>
+    <li><strong>Авторы (Id):</strong> @string.Join(", ", Model.AuthorIds)</li>
+</ul>
+
+<form method="post" action="/Publication/DeleteConfirmed/@Model.Id">
+    <button class="btn btn-danger">Удалить</button>
+    <a class="btn btn-secondary" href="/Publication/Index">Отмена</a>
+</form>

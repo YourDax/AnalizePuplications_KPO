@@ -14,7 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AnalizePuplicationsBusinessLogic\AnalizePuplicationsBusinessLogic.csproj" />
+    <ProjectReference Include="..\AnalizePuplicationsContracts\AnalizePuplicationsContracts.csproj" />
     <ProjectReference Include="..\AnalizePuplicationsDataBaseImplement\AnalizePuplicationsDataBaseImplement.csproj" />
+    <ProjectReference Include="..\AnalizePuplicationsDataModels\AnalizePuplicationsDataModels.csproj" />
   </ItemGroup>
 
 </Project>

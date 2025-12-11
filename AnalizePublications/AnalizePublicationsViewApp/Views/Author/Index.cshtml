@@ -1,0 +1,25 @@
+﻿@model IEnumerable<AnalyzePublicationsContracts.ViewModels.AuthorViewModel>
+
+<h2>Авторы</h2>
+
+<a class="btn btn-primary" href="/Author/Create">Создать автора</a>
+
+<table class="table mt-3">
+    <tr>
+        <th>Id</th>
+        <th>ФИО</th>
+        <th></th>
+    </tr>
+
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>@a.Id</td>
+            <td>@a.FullName</td>
+            <td>
+                <a href="/Author/Edit/@a.Id">Редактировать</a> |
+                <a href="/Author/Delete/@a.Id">Удалить</a>
+            </td>
+        </tr>
+    }
+</table>

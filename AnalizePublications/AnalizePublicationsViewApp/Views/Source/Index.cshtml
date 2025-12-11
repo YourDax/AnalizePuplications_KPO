@@ -1,0 +1,31 @@
+﻿@model IEnumerable<AnalyzePublicationsContracts.ViewModels.SourceViewModel>
+
+<h2>Источники</h2>
+
+<a class="btn btn-primary" href="/Source/Create">Создать источник</a>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Тип</th>
+            <th>URL</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var s in Model)
+        {
+            <tr>
+                <td>@s.Id</td>
+                <td>@s.SourceType</td>
+                <td>@s.Url</td>
+                <td>
+                    <a href="/Source/Edit/@s.Id">Редактировать</a> |
+                    <a href="/Source/Delete/@s.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

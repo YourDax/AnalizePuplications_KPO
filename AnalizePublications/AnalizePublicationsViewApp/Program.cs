@@ -1,23 +1,36 @@
+using AnalizePuplicationsContracts.BusinessLogicContracts;
+using AnalyzePublicationsBusinessLogic.BusinessLogic;
+using AnalyzePublicationsContracts.StorageContracts;
+using AnalyzePublicationsDatabaseImplement.Implements;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Добавляем контроллеры с Views
 builder.Services.AddControllersWithViews();
 
+// ----------------------
+// Регистрация бизнес-логики
+// ----------------------
+builder.Services.AddScoped<IAuthorLogic, AuthorLogic>();
+builder.Services.AddScoped<IPublicationLogic, PublicationLogic>();
+builder.Services.AddScoped<ISourceLogic, SourceLogic>();
+
+// ----------------------
+// Регистрация хранилищ (Storage)
+// ----------------------
+builder.Services.AddScoped<IAuthorStorage, AuthorStorage>(); // твоя реализация
+builder.Services.AddScoped<IPublicationStorage, PublicationStorage>();
+builder.Services.AddScoped<ISourceStorage, SourceStorage>();
+
+// ----------------------
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(

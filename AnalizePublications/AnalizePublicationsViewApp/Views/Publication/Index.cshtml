@@ -1,0 +1,41 @@
+﻿@model IEnumerable<AnalyzePublicationsContracts.ViewModels.PublicationViewModel>
+
+<h2>Публикации</h2>
+
+<a class="btn btn-primary" href="/Publication/Create">Создать публикацию</a>
+
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Название</th>
+            <th>Год</th>
+            <th>Тип</th>
+            <th>Источник</th>
+            <th>DOI</th>
+            <th>Цитирования</th>
+            <th>Авторы (Id)</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Id</td>
+                <td>@p.Title</td>
+                <td>@p.Year</td>
+                <td>@p.PublicationType</td>
+                <td>@p.SourceId</td>
+                <td>@p.Doi</td>
+                <td>@p.CitationCount</td>
+                <td>@string.Join(", ", p.AuthorIds)</td>
+                <td>
+                    <a href="/Publication/Edit/@p.Id">Редактировать</a> |
+                    <a href="/Publication/Delete/@p.Id">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

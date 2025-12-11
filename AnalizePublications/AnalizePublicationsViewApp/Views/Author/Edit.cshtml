@@ -1,0 +1,14 @@
+﻿@model AnalyzePublicationsContracts.BindingModels.AuthorBindingModel
+
+<h2>Редактировать автора</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label>ФИО</label>
+        <input asp-for="FullName" class="form-control" />
+    </div>
+
+    <button class="btn btn-warning mt-2">Сохранить</button>
+</form>

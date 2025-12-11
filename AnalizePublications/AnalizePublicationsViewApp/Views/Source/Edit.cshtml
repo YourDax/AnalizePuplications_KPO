@@ -1,0 +1,32 @@
+﻿@model AnalyzePublicationsContracts.BindingModels.SourceBindingModel
+@{
+    ViewData["Title"] = "Редактировать источник";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="SourceType">Тип источника</label>
+        <select asp-for="SourceType" class="form-control">
+            @foreach (var type in Enum.GetValues(typeof(AnalyzePublicationsDataModels.Enums.SourceType)))
+            {
+                var enumValue = (AnalyzePublicationsDataModels.Enums.SourceType)type;
+                <option value="@((int)enumValue)">
+                    @enumValue
+                </option>
+            }
+        </select>
+        <span asp-validation-for="SourceType" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <label asp-for="Url">URL</label>
+        <input asp-for="Url" class="form-control" />
+        <span asp-validation-for="Url" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
+</form>

@@ -12,5 +12,6 @@ namespace AnalyzePublicationsContracts.ViewModels
         public int SourceId { get; set; }
         public string? Doi { get; set; }
         public int CitationCount { get; set; }
+        public List<int> AuthorIds { get; set; } = new();
     }
 }

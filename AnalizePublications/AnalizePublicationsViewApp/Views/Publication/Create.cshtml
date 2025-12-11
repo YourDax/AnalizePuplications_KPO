@@ -1,0 +1,63 @@
+﻿@using AnalyzePublicationsDataModels.Enums
+@model AnalyzePublicationsContracts.ViewModels.PublicationViewModel
+
+@{
+    ViewData["Title"] = "Добавить публикацию";
+}
+
+<h2>Добавить публикацию</h2>
+
+<form asp-action="Create" method="post">
+
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Year"></label>
+        <input asp-for="Year" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <!-- ENUM PublicationType -->
+    <div class="form-group">
+        <label asp-for="PublicationType">Тип публикации</label>
+        <select asp-for="PublicationType" class="form-control">
+            @foreach (var type in Enum.GetValues(typeof(PublicationType)))
+            {
+                var enumValue = (PublicationType)type;
+
+                <option value="@((int)enumValue)">
+                    @enumValue
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SourceId">Источник</label>
+        <select asp-for="SourceId" asp-items="ViewBag.Sources" class="form-control"></select>
+        <span asp-validation-for="SourceId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Doi"></label>
+        <input asp-for="Doi" class="form-control" />
+        <span asp-validation-for="Doi" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CitationCount"></label>
+        <input asp-for="CitationCount" class="form-control" />
+        <span asp-validation-for="CitationCount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Авторы</label>
+        <select asp-for="AuthorIds" asp-items="ViewBag.Authors" class="form-control" multiple></select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Создать</button>
+</form>

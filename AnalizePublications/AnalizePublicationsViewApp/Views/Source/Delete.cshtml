@@ -1,0 +1,10 @@
+﻿@model AnalyzePublicationsContracts.ViewModels.SourceViewModel
+
+<h2>Удалить источник</h2>
+
+<p>Вы уверены, что хотите удалить источник: <strong>@Model.Url</strong>?</p>
+
+<form method="post" action="/Source/DeleteConfirmed/@Model.Id">
+    <button class="btn btn-danger">Удалить</button>
+    <a class="btn btn-secondary" href="/Source">Отмена</a>
+</form>
