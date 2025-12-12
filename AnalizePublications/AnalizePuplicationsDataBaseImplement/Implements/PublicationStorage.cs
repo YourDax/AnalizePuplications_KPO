@@ -14,12 +14,25 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             using var context = new PublicationsDatabase();
             return context.Publications
                 .Include(x => x.Source)
-                .Select(x => x.GetViewModel)
+                .Include(x => x.PublicationAuthors)
+                .Select(x => new PublicationViewModel
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    Year = x.Year,
+                    PublicationType = x.PublicationType,
+                    SourceId = x.SourceId,
+                    Doi = x.Doi,
+                    CitationCount = x.CitationCount,
+                    AuthorIds = x.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                })
                 .ToList();
         }
 
         public List<PublicationViewModel> GetFilteredList(PublicationSearchModel model)
         {
+            if (model == null) return GetFullList();
+
             using var context = new PublicationsDatabase();
 
             var query = context.Publications
@@ -51,6 +64,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public PublicationViewModel? GetElement(PublicationSearchModel model)
         {
+            if (model == null) return null;
+
             using var context = new PublicationsDatabase();
 
             var query = context.Publications
@@ -63,7 +78,7 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             if (!string.IsNullOrEmpty(model.Title))
                 entity = query.FirstOrDefault(x => x.Title == model.Title);
 
-            if (model.Id.HasValue)
+            if (entity == null && model.Id.HasValue)
                 entity = query.FirstOrDefault(x => x.Id == model.Id.Value);
 
             if (entity == null) return null;
@@ -84,70 +99,127 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public PublicationViewModel? Insert(PublicationBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = Publication.Create(model);
-            context.Publications.Add(entity);
-            context.SaveChanges();
+            if (model == null) return null;
 
-            // создаём связи с авторами
-            if (model.AuthorIds != null)
+            try
             {
-                foreach (var authorId in model.AuthorIds)
-                {
-                    context.PublicationAuthors.Add(new PublicationAuthor
-                    {
-                        PublicationId = entity.Id,
-                        AuthorId = authorId
-                    });
-                }
-                context.SaveChanges();
-            }
+                using var context = new PublicationsDatabase();
+                var entity = Publication.Create(model);
+                if (entity == null) return null;
 
-            return entity.GetViewModel;
+                context.Publications.Add(entity);
+                context.SaveChanges();
+
+                // создаём связи с авторами
+                if (model.AuthorIds != null && model.AuthorIds.Count > 0)
+                {
+                    foreach (var authorId in model.AuthorIds)
+                    {
+                        context.PublicationAuthors.Add(new PublicationAuthor
+                        {
+                            PublicationId = entity.Id,
+                            AuthorId = authorId
+                        });
+                    }
+                    context.SaveChanges();
+                }
+
+                // Перезагружаем entity с авторами для получения полного ViewModel
+                entity = context.Publications
+                    .Include(p => p.PublicationAuthors)
+                    .FirstOrDefault(p => p.Id == entity.Id);
+
+                if (entity == null) return null;
+
+                return new PublicationViewModel
+                {
+                    Id = entity.Id,
+                    Title = entity.Title,
+                    Year = entity.Year,
+                    PublicationType = entity.PublicationType,
+                    SourceId = entity.SourceId,
+                    Doi = entity.Doi,
+                    CitationCount = entity.CitationCount,
+                    AuthorIds = entity.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
 
 
         public PublicationViewModel? Update(PublicationBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = context.Publications
-                .Include(p => p.PublicationAuthors)
-                .FirstOrDefault(x => x.Id == model.Id);
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            entity.Update(model);
-
-            // удаляем старые связи
-            context.PublicationAuthors.RemoveRange(entity.PublicationAuthors);
-            context.SaveChanges();
-
-            // добавляем новые связи
-            if (model.AuthorIds != null)
+            try
             {
-                foreach (var authorId in model.AuthorIds)
-                {
-                    context.PublicationAuthors.Add(new PublicationAuthor
-                    {
-                        PublicationId = entity.Id,
-                        AuthorId = authorId
-                    });
-                }
-            }
+                using var context = new PublicationsDatabase();
+                var entity = context.Publications
+                    .Include(p => p.PublicationAuthors)
+                    .FirstOrDefault(x => x.Id == model.Id);
+                if (entity == null) return null;
 
-            context.SaveChanges();
-            return entity.GetViewModel;
+                entity.Update(model);
+
+                // удаляем старые связи
+                context.PublicationAuthors.RemoveRange(entity.PublicationAuthors);
+                context.SaveChanges();
+
+                // добавляем новые связи
+                if (model.AuthorIds != null && model.AuthorIds.Count > 0)
+                {
+                    foreach (var authorId in model.AuthorIds)
+                    {
+                        context.PublicationAuthors.Add(new PublicationAuthor
+                        {
+                            PublicationId = entity.Id,
+                            AuthorId = authorId
+                        });
+                    }
+                }
+
+                context.SaveChanges();
+
+                return new PublicationViewModel
+                {
+                    Id = entity.Id,
+                    Title = entity.Title,
+                    Year = entity.Year,
+                    PublicationType = entity.PublicationType,
+                    SourceId = entity.SourceId,
+                    Doi = entity.Doi,
+                    CitationCount = entity.CitationCount,
+                    AuthorIds = entity.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
 
 
         public PublicationViewModel? Delete(PublicationBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = context.Publications.FirstOrDefault(x => x.Id == model.Id);
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            context.Publications.Remove(entity);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = context.Publications.FirstOrDefault(x => x.Id == model.Id);
+                if (entity == null) return null;
+
+                context.Publications.Remove(entity);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public List<PublicationViewModel> GetPublicationsByAuthor(int authorId)
@@ -159,7 +231,17 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 .Include(p => p.PublicationAuthors)
                 .Where(p => p.PublicationAuthors
                     .Any(pa => pa.AuthorId == authorId))
-                .Select(p => p.GetViewModel)
+                .Select(p => new PublicationViewModel
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Year = p.Year,
+                    PublicationType = p.PublicationType,
+                    SourceId = p.SourceId,
+                    Doi = p.Doi,
+                    CitationCount = p.CitationCount,
+                    AuthorIds = p.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                })
                 .ToList();
         }
 

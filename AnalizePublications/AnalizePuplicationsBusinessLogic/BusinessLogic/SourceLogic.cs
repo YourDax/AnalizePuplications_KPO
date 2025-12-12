@@ -5,7 +5,7 @@ using AnalyzePublicationsContracts.StorageContracts;
 using AnalyzePublicationsContracts.ViewModels;
 using Microsoft.Extensions.Logging;
 
-namespace AnalyzePublicationsBusinessLogic.BusinessLogic
+namespace AnalizePuplicationsBusinessLogic.BusinessLogic
 {
     public class SourceLogic : ISourceLogic
     {

@@ -3,6 +3,7 @@ using AnalyzePublicationsContracts.BindingModels;
 using AnalyzePublicationsContracts.SearchModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 
 namespace AnalyzePublicationsWeb.Controllers
 {
@@ -42,15 +43,24 @@ namespace AnalyzePublicationsWeb.Controllers
                 return View(model);
             }
 
-            bool result = _publicationLogic.Create(model);
-            if (!result)
+            try
             {
-                ModelState.AddModelError("", "Не удалось создать публикацию");
+                bool result = _publicationLogic.Create(model);
+                if (!result)
+                {
+                    ModelState.AddModelError("", "Не удалось создать публикацию");
+                    PopulateAuthorsAndSources();
+                    return View(model);
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
                 PopulateAuthorsAndSources();
                 return View(model);
             }
-
-            return RedirectToAction("Index");
         }
 
         public IActionResult Edit(int id)
@@ -82,15 +92,24 @@ namespace AnalyzePublicationsWeb.Controllers
                 return View(model);
             }
 
-            bool result = _publicationLogic.Update(model);
-            if (!result)
+            try
             {
-                ModelState.AddModelError("", "Не удалось обновить публикацию");
+                bool result = _publicationLogic.Update(model);
+                if (!result)
+                {
+                    ModelState.AddModelError("", "Не удалось обновить публикацию");
+                    PopulateAuthorsAndSources();
+                    return View(model);
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
                 PopulateAuthorsAndSources();
                 return View(model);
             }
-
-            return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int id)
@@ -104,7 +123,18 @@ namespace AnalyzePublicationsWeb.Controllers
         [HttpPost]
         public IActionResult DeleteConfirmed(int id)
         {
-            _publicationLogic.Delete(new PublicationBindingModel { Id = id });
+            try
+            {
+                bool result = _publicationLogic.Delete(new PublicationBindingModel { Id = id });
+                if (!result)
+                {
+                    TempData["ErrorMessage"] = "Не удалось удалить публикацию";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
             return RedirectToAction("Index");
         }
 
@@ -113,13 +143,13 @@ namespace AnalyzePublicationsWeb.Controllers
             var authors = _authorLogic.ReadList(null);
             var sources = _sourceLogic.ReadList(null);
 
-            ViewBag.Authors = authors
+            ViewBag.Authors = authors?
                 .Select(a => new SelectListItem { Value = a.Id.ToString(), Text = a.FullName })
-                .ToList();
+                .ToList() ?? new List<SelectListItem>();
 
-            ViewBag.Sources = sources
+            ViewBag.Sources = sources?
                 .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Url })
-                .ToList();
+                .ToList() ?? new List<SelectListItem>();
         }
     }
 }

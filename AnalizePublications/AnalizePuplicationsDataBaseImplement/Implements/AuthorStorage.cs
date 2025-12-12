@@ -19,6 +19,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public List<AuthorViewModel> GetFilteredList(AuthorSearchModel model)
         {
+            if (model == null) return GetFullList();
+
             using var context = new PublicationsDatabase();
             var query = context.Authors.AsQueryable();
 
@@ -32,6 +34,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public AuthorViewModel? GetElement(AuthorSearchModel model)
         {
+            if (model == null) return null;
+
             using var context = new PublicationsDatabase();
 
             if (!string.IsNullOrEmpty(model.FullName))
@@ -49,33 +53,62 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public AuthorViewModel? Insert(AuthorBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = Author.Create(model);
-            context.Authors.Add(entity);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            if (model == null) return null;
+
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = Author.Create(model);
+                if (entity == null) return null;
+
+                context.Authors.Add(entity);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public AuthorViewModel? Update(AuthorBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = context.Authors.FirstOrDefault(x => x.Id == model.Id);
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            entity.Update(model);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = context.Authors.FirstOrDefault(x => x.Id == model.Id);
+                if (entity == null) return null;
+
+                entity.Update(model);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public AuthorViewModel? Delete(AuthorBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = context.Authors.FirstOrDefault(x => x.Id == model.Id);
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            context.Authors.Remove(entity);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = context.Authors.FirstOrDefault(x => x.Id == model.Id);
+                if (entity == null) return null;
+
+                context.Authors.Remove(entity);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

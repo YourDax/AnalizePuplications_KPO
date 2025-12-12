@@ -1,24 +1,24 @@
 using AnalizePuplicationsContracts.BusinessLogicContracts;
-using AnalyzePublicationsBusinessLogic.BusinessLogic;
+using AnalizePuplicationsBusinessLogic.BusinessLogic;
 using AnalyzePublicationsContracts.StorageContracts;
 using AnalyzePublicationsDatabaseImplement.Implements;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавляем контроллеры с Views
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ Views
 builder.Services.AddControllersWithViews();
 
 // ----------------------
-// Регистрация бизнес-логики
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ
 // ----------------------
 builder.Services.AddScoped<IAuthorLogic, AuthorLogic>();
 builder.Services.AddScoped<IPublicationLogic, PublicationLogic>();
 builder.Services.AddScoped<ISourceLogic, SourceLogic>();
 
 // ----------------------
-// Регистрация хранилищ (Storage)
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (Storage)
 // ----------------------
-builder.Services.AddScoped<IAuthorStorage, AuthorStorage>(); // твоя реализация
+builder.Services.AddScoped<IAuthorStorage, AuthorStorage>(); // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddScoped<IPublicationStorage, PublicationStorage>();
 builder.Services.AddScoped<ISourceStorage, SourceStorage>();
 

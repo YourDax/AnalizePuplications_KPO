@@ -2,6 +2,7 @@
 using AnalizePuplicationsContracts.BusinessLogicContracts;
 using AnalyzePublicationsContracts.BindingModels;
 using AnalyzePublicationsContracts.SearchModels;
+using System;
 
 namespace AnalyzePublicationsWeb.Controllers
 {
@@ -33,14 +34,22 @@ namespace AnalyzePublicationsWeb.Controllers
                 return View(model);
             }
 
-            bool result = _sourceLogic.Create(model);
-            if (!result)
+            try
             {
-                ModelState.AddModelError("", "Не удалось создать источник");
+                bool result = _sourceLogic.Create(model);
+                if (!result)
+                {
+                    ModelState.AddModelError("", "Не удалось создать источник");
+                    return View(model);
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
                 return View(model);
             }
-
-            return RedirectToAction("Index");
         }
 
         public IActionResult Edit(int id)
@@ -64,14 +73,22 @@ namespace AnalyzePublicationsWeb.Controllers
                 return View(model);
             }
 
-            bool result = _sourceLogic.Update(model);
-            if (!result)
+            try
             {
-                ModelState.AddModelError("", "Не удалось обновить источник");
+                bool result = _sourceLogic.Update(model);
+                if (!result)
+                {
+                    ModelState.AddModelError("", "Не удалось обновить источник");
+                    return View(model);
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
                 return View(model);
             }
-
-            return RedirectToAction("Index");
         }
 
         public IActionResult Delete(int id)
@@ -85,7 +102,18 @@ namespace AnalyzePublicationsWeb.Controllers
         [HttpPost]
         public IActionResult DeleteConfirmed(int id)
         {
-            _sourceLogic.Delete(new SourceBindingModel { Id = id });
+            try
+            {
+                bool result = _sourceLogic.Delete(new SourceBindingModel { Id = id });
+                if (!result)
+                {
+                    TempData["ErrorMessage"] = "Не удалось удалить источник";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
             return RedirectToAction("Index");
         }
     }

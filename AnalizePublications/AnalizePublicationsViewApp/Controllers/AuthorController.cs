@@ -2,6 +2,7 @@
 using AnalizePuplicationsContracts.BusinessLogicContracts;
 using AnalyzePublicationsContracts.BindingModels;
 using AnalyzePublicationsContracts.SearchModels;
+using System;
 
 namespace AnalyzePublicationsWeb.Controllers
 {
@@ -27,8 +28,21 @@ namespace AnalyzePublicationsWeb.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            _authorLogic.Create(model);
-            return RedirectToAction("Index");
+            try
+            {
+                bool result = _authorLogic.Create(model);
+                if (!result)
+                {
+                    ModelState.AddModelError("", "Не удалось создать автора");
+                    return View(model);
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
         }
 
         public IActionResult Edit(int id)
@@ -48,8 +62,21 @@ namespace AnalyzePublicationsWeb.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            _authorLogic.Update(model);
-            return RedirectToAction("Index");
+            try
+            {
+                bool result = _authorLogic.Update(model);
+                if (!result)
+                {
+                    ModelState.AddModelError("", "Не удалось обновить автора");
+                    return View(model);
+                }
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
         }
 
         public IActionResult Delete(int id)
@@ -63,7 +90,18 @@ namespace AnalyzePublicationsWeb.Controllers
         [HttpPost]
         public IActionResult DeleteConfirmed(int id)
         {
-            _authorLogic.Delete(new AuthorBindingModel { Id = id });
+            try
+            {
+                bool result = _authorLogic.Delete(new AuthorBindingModel { Id = id });
+                if (!result)
+                {
+                    TempData["ErrorMessage"] = "Не удалось удалить автора";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
             return RedirectToAction("Index");
         }
     }

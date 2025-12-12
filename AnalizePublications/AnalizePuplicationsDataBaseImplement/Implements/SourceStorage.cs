@@ -17,6 +17,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public List<SourceViewModel> GetFilteredList(SourceSearchModel model)
         {
+            if (model == null) return GetFullList();
+
             using var context = new PublicationsDatabase();
             var query = context.Sources.AsQueryable();
 
@@ -28,6 +30,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public SourceViewModel? GetElement(SourceSearchModel model)
         {
+            if (model == null) return null;
+
             using var context = new PublicationsDatabase();
             if (!string.IsNullOrEmpty(model.Name))
                 return context.Sources.FirstOrDefault(x => x.Name == model.Name)?.GetViewModel;
@@ -38,33 +42,62 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
         public SourceViewModel? Insert(SourceBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = Source.Create(model);
-            context.Sources.Add(entity);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            if (model == null) return null;
+
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = Source.Create(model);
+                if (entity == null) return null;
+
+                context.Sources.Add(entity);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public SourceViewModel? Update(SourceBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = context.Sources.FirstOrDefault(x => x.Id == model.Id);
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            entity.Update(model);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = context.Sources.FirstOrDefault(x => x.Id == model.Id);
+                if (entity == null) return null;
+
+                entity.Update(model);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public SourceViewModel? Delete(SourceBindingModel model)
         {
-            using var context = new PublicationsDatabase();
-            var entity = context.Sources.FirstOrDefault(x => x.Id == model.Id);
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            context.Sources.Remove(entity);
-            context.SaveChanges();
-            return entity.GetViewModel;
+            try
+            {
+                using var context = new PublicationsDatabase();
+                var entity = context.Sources.FirstOrDefault(x => x.Id == model.Id);
+                if (entity == null) return null;
+
+                context.Sources.Remove(entity);
+                context.SaveChanges();
+                return entity.GetViewModel;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
