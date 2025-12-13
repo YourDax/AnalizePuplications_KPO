@@ -1,31 +1,54 @@
 ﻿@model IEnumerable<AnalyzePublicationsContracts.ViewModels.SourceViewModel>
 
-<h2>Источники</h2>
+@{
+    ViewData["Title"] = "Управление источниками";
+}
 
-<a class="btn btn-primary" href="/Source/Create">Создать источник</a>
+<h2>Управление источниками</h2>
 
-<table class="table mt-3">
+<div class="mb-3">
+    <a class="btn btn-primary" href="@Url.Action("Create")">Создать источник</a>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>Id</th>
+            <th>ID</th>
+            <th>Название</th>
             <th>Тип</th>
             <th>URL</th>
-            <th></th>
+            <th>Действия</th>
         </tr>
     </thead>
-
     <tbody>
-        @foreach (var s in Model)
+        @foreach (var source in Model)
         {
             <tr>
-                <td>@s.Id</td>
-                <td>@s.SourceType</td>
-                <td>@s.Url</td>
+                <td>@source.Id</td>
+                <td>@source.Name</td>
+                <td>@source.SourceType</td>
                 <td>
-                    <a href="/Source/Edit/@s.Id">Редактировать</a> |
-                    <a href="/Source/Delete/@s.Id">Удалить</a>
+                    @if (!string.IsNullOrEmpty(source.Url))
+                    {
+                        <a href="@source.Url" target="_blank">@source.Url</a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Не указан</span>
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Edit", new { id = source.Id })" class="btn btn-sm btn-warning">Редактировать</a>
+                    <a href="@Url.Action("Delete", new { id = source.Id })" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<p class="text-muted">Всего источников: @Model.Count()</p>

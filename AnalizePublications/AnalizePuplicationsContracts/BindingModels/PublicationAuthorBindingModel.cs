@@ -7,3 +7,10 @@ namespace AnalyzePublicationsContracts.BindingModels
     }
 }
 
+
+
+
+
+
+
+

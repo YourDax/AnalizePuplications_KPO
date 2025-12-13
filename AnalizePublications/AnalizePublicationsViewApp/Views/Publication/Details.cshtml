@@ -1,0 +1,72 @@
+@model AnalyzePublicationsContracts.ViewModels.PublicationViewModel
+
+@{
+    ViewData["Title"] = "Детали публикации";
+}
+
+<h2>Детали публикации</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Название:</dt>
+            <dd class="col-sm-8">@Model.Title</dd>
+
+            <dt class="col-sm-4">Дата публикации:</dt>
+            <dd class="col-sm-8">@(Model.PublicationDate?.ToString("dd.MM.yyyy") ?? "Не указана")</dd>
+
+            <dt class="col-sm-4">Тип публикации:</dt>
+            <dd class="col-sm-8">@Model.PublicationType</dd>
+
+            <dt class="col-sm-4">DOI:</dt>
+            <dd class="col-sm-8">@(Model.Doi ?? "Не указан")</dd>
+
+            <dt class="col-sm-4">Количество страниц:</dt>
+            <dd class="col-sm-8">@(Model.Pages?.ToString() ?? "Не указано")</dd>
+
+            <dt class="col-sm-4">Количество цитирований:</dt>
+            <dd class="col-sm-8">@Model.CitationCount</dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        @if (!string.IsNullOrEmpty(Model.Abstract))
+        {
+            <h4>Аннотация</h4>
+            <p>@Model.Abstract</p>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Keywords))
+        {
+            <h4>Ключевые слова</h4>
+            <p>@Model.Keywords</p>
+        }
+
+        @if (Model.Authors != null && Model.Authors.Any())
+        {
+            <h4>Авторы</h4>
+            <ul>
+                @foreach (var author in Model.Authors)
+                {
+                    <li>
+                        @author.AuthorName
+                        @if (!string.IsNullOrEmpty(author.AuthorContribution))
+                        {
+                            <span class="text-muted">(@author.AuthorContribution)</span>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="@Url.Action("Browse")" class="btn btn-secondary">Назад к списку</a>
+</div>
+
+
+
+
+
+
+

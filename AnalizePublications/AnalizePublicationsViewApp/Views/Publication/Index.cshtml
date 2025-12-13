@@ -1,43 +1,53 @@
 ﻿@model IEnumerable<AnalyzePublicationsContracts.ViewModels.PublicationViewModel>
 
-<h2>Публикации</h2>
+@{
+    ViewData["Title"] = "Управление публикациями";
+}
 
-<a class="btn btn-primary" href="/Publication/Create">Создать публикацию</a>
+<h2>Управление публикациями</h2>
 
-<table class="table mt-3">
+<div class="mb-3">
+    <a class="btn btn-primary" href="@Url.Action("Create")">Создать публикацию</a>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>Id</th>
+            <th>ID</th>
             <th>Название</th>
             <th>Дата публикации</th>
             <th>Тип</th>
-            <th>Источник</th>
-            <th>DOI</th>
+            <th>Источник ID</th>
             <th>Страниц</th>
             <th>Цитирования</th>
             <th>Авторы</th>
-            <th></th>
+            <th>Действия</th>
         </tr>
     </thead>
-
     <tbody>
-        @foreach (var p in Model)
+        @foreach (var pub in Model)
         {
             <tr>
-                <td>@p.Id</td>
-                <td>@p.Title</td>
-                <td>@(p.PublicationDate?.ToString("dd.MM.yyyy") ?? "Не указана")</td>
-                <td>@p.PublicationType</td>
-                <td>@p.SourceId</td>
-                <td>@p.Doi</td>
-                <td>@(p.Pages?.ToString() ?? "-")</td>
-                <td>@p.CitationCount</td>
-                <td>@string.Join(", ", p.Authors?.Select(a => a.AuthorName) ?? new List<string>())</td>
+                <td>@pub.Id</td>
+                <td>@pub.Title</td>
+                <td>@(pub.PublicationDate?.ToString("dd.MM.yyyy") ?? "Не указана")</td>
+                <td>@pub.PublicationType</td>
+                <td>@pub.SourceId</td>
+                <td>@(pub.Pages?.ToString() ?? "-")</td>
+                <td>@pub.CitationCount</td>
+                <td>@string.Join(", ", pub.Authors?.Select(a => a.AuthorName) ?? new List<string>())</td>
                 <td>
-                    <a href="/Publication/Edit/@p.Id">Редактировать</a> |
-                    <a href="/Publication/Delete/@p.Id">Удалить</a>
+                    <a href="@Url.Action("Edit", new { id = pub.Id })" class="btn btn-sm btn-warning">Редактировать</a>
+                    <a href="@Url.Action("Delete", new { id = pub.Id })" class="btn btn-sm btn-danger">Удалить</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<p class="text-muted">Всего публикаций: @Model.Count()</p>

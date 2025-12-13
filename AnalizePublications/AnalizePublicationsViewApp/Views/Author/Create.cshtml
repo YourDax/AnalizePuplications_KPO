@@ -1,12 +1,38 @@
 ﻿@model AnalyzePublicationsContracts.BindingModels.AuthorBindingModel
 
+@{
+    ViewData["Title"] = "Создать автора";
+}
+
 <h2>Создать автора</h2>
 
-<form method="post">
-    <div class="form-group">
-        <label>ФИО</label>
+<form method="post" asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group mb-3">
+        <label asp-for="FullName" class="form-label">Полное имя *</label>
         <input asp-for="FullName" class="form-control" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
 
-    <button class="btn btn-success mt-2">Создать</button>
+    <div class="form-group mb-3">
+        <label asp-for="Affiliation" class="form-label">Организация/Кафедра *</label>
+        <input asp-for="Affiliation" class="form-control" />
+        <span asp-validation-for="Affiliation" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Email" class="form-label">Электронная почта *</label>
+        <input asp-for="Email" type="email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-success">Создать</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary">Отмена</a>
+    </div>
 </form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

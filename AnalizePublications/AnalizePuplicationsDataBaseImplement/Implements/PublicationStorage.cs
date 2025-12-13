@@ -135,7 +135,11 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             {
                 using var context = new PublicationsDatabase();
                 var entity = Publication.Create(model);
-                if (entity == null) return null;
+                if (entity == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Publication.Create вернул null");
+                    return null;
+                }
 
                 context.Publications.Add(entity);
                 context.SaveChanges();
@@ -145,6 +149,14 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 {
                     foreach (var author in model.Authors)
                     {
+                        // Проверяем, что автор существует
+                        var authorExists = context.Authors.Any(a => a.Id == author.AuthorId);
+                        if (!authorExists)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Автор с Id {author.AuthorId} не существует");
+                            continue;
+                        }
+
                         context.PublicationAuthors.Add(new PublicationAuthor
                         {
                             PublicationId = entity.Id,
@@ -154,6 +166,10 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                     }
                     context.SaveChanges();
                 }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Нет авторов для публикации");
+                }
 
                 // Перезагружаем entity с авторами для получения полного ViewModel
                 entity = context.Publications
@@ -161,7 +177,11 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                         .ThenInclude(pa => pa.Author)
                     .FirstOrDefault(p => p.Id == entity.Id);
 
-                if (entity == null) return null;
+                if (entity == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Не удалось перезагрузить entity после создания");
+                    return null;
+                }
 
                 return new PublicationViewModel
                 {
@@ -183,8 +203,15 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                     }).ToList()
                 };
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Исключение в PublicationStorage.Insert: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Тип: {ex.GetType().Name}");
+                System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Внутреннее исключение: {ex.InnerException.Message}");
+                }
                 return null;
             }
         }

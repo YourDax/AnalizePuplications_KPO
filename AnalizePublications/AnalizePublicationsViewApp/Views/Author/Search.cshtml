@@ -1,0 +1,142 @@
+@model IEnumerable<AnalyzePublicationsContracts.ViewModels.AuthorViewModel>
+
+@{
+    ViewData["Title"] = "Поиск авторов";
+}
+
+<h2>Поиск авторов</h2>
+
+<form method="get" action="@Url.Action("Search")" class="mb-4">
+    <div class="row">
+        <div class="col-md-3">
+            <label for="fullName" class="form-label">Полное имя</label>
+            <input type="text" class="form-control" id="fullName" name="fullName" value="@ViewBag.FullName" />
+        </div>
+        <div class="col-md-3">
+            <label for="affiliation" class="form-label">Организация</label>
+            <input type="text" class="form-control" id="affiliation" name="affiliation" value="@ViewBag.Affiliation" />
+        </div>
+        <div class="col-md-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="@ViewBag.Email" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Поиск</button>
+        </div>
+    </div>
+    <input type="hidden" name="sortBy" value="@ViewBag.SortBy" />
+    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+</form>
+
+@if (Model.Any())
+{
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "FullName", sortOrder = ViewBag.SortBy == "FullName" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Полное имя
+                        @if (ViewBag.SortBy == "FullName")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "Affiliation", sortOrder = ViewBag.SortBy == "Affiliation" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Организация
+                        @if (ViewBag.SortBy == "Affiliation")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "Email", sortOrder = ViewBag.SortBy == "Email" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Email
+                        @if (ViewBag.SortBy == "Email")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "PublicationsCount", sortOrder = ViewBag.SortBy == "PublicationsCount" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Публикаций
+                        @if (ViewBag.SortBy == "PublicationsCount")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "CoauthorsCount", sortOrder = ViewBag.SortBy == "CoauthorsCount" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Соавторов
+                        @if (ViewBag.SortBy == "CoauthorsCount")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "CitationCount", sortOrder = ViewBag.SortBy == "CitationCount" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Цитирований
+                        @if (ViewBag.SortBy == "CitationCount")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "HIndex", sortOrder = ViewBag.SortBy == "HIndex" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        H-индекс
+                        @if (ViewBag.SortBy == "HIndex")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>
+                    <a href="@Url.Action("Search", new { fullName = ViewBag.FullName, affiliation = ViewBag.Affiliation, email = ViewBag.Email, sortBy = "AveragePages", sortOrder = ViewBag.SortBy == "AveragePages" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                        Сред. страниц
+                        @if (ViewBag.SortBy == "AveragePages")
+                        {
+                            <span>@(ViewBag.SortOrder == "asc" ? "↑" : "↓")</span>
+                        }
+                    </a>
+                </th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var author in Model)
+            {
+                <tr>
+                    <td>@author.FullName</td>
+                    <td>@author.Affiliation</td>
+                    <td>@author.Email</td>
+                    <td>@author.PublicationsCount</td>
+                    <td>@author.CoauthorsCount</td>
+                    <td>@author.CitationCount</td>
+                    <td>@author.HIndex</td>
+                    <td>@author.AveragePages.ToString("F2")</td>
+                    <td>
+                        <a href="@Url.Action("Details", new { id = author.Id })" class="btn btn-sm btn-info">Детали</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p class="text-muted">Найдено авторов: @Model.Count()</p>
+}
+else
+{
+    <div class="alert alert-info">Авторы не найдены</div>
+}
+
+
+
+
+
+
+

@@ -19,11 +19,29 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="viewDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Просмотр и поиск
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="viewDropdown">
+                                <li><a class="dropdown-item" asp-controller="Author" asp-action="Browse">Авторы</a></li>
+                                <li><a class="dropdown-item" asp-controller="Publication" asp-action="Browse">Публикации</a></li>
+                                <li><a class="dropdown-item" asp-controller="Source" asp-action="Browse">Источники</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="Author" asp-action="Search">Поиск авторов</a></li>
+                                <li><a class="dropdown-item" asp-controller="Publication" asp-action="Search">Поиск публикаций</a></li>
+                                <li><a class="dropdown-item" asp-controller="Source" asp-action="Search">Поиск источников</a></li>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="editDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Редактирование
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="editDropdown">
+                                <li><a class="dropdown-item" asp-controller="Author" asp-action="Index">Авторы</a></li>
+                                <li><a class="dropdown-item" asp-controller="Publication" asp-action="Index">Публикации</a></li>
+                                <li><a class="dropdown-item" asp-controller="Source" asp-action="Index">Источники</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -41,6 +59,66 @@
             &copy; 2025 - AnalizePublicationsViewApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+    
+    <!-- Незаметная кнопка для инициализации тестовых данных -->
+    <button type="button" id="testDataBtn" class="btn btn-sm btn-outline-secondary" style="position: fixed; bottom: 5px; right: 5px; z-index: 1000; opacity: 0.2; font-size: 9px; padding: 1px 3px; border: none; background: transparent;" title="Инициализировать тестовые данные" onmouseover="this.style.opacity='0.5'" onmouseout="this.style.opacity='0.2'">
+        ⚙
+    </button>
+
+    <!-- Модальное окно для выбора действия -->
+    <div class="modal fade" id="testDataModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Инициализация тестовых данных</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage">Выберите действие:</p>
+                    <form id="testDataForm" method="post" action="@Url.Action("Initialize", "TestData")">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="action" id="actionInput" value="create" />
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary" onclick="setActionAndSubmit('create')" id="createBtn">
+                                Создать тестовые данные
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="setActionAndSubmit('clear')" id="clearBtn">
+                                Удалить все данные из базы данных
+                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var testDataBtn = document.getElementById('testDataBtn');
+            if (testDataBtn) {
+                testDataBtn.addEventListener('click', function() {
+                    // Просто показываем модальное окно - все кнопки всегда видны
+                    var modalElement = document.getElementById('testDataModal');
+                    if (modalElement) {
+                        var modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                    }
+                });
+            }
+
+            window.setActionAndSubmit = function(action) {
+                var actionInput = document.getElementById('actionInput');
+                var form = document.getElementById('testDataForm');
+                if (actionInput && form) {
+                    actionInput.value = action;
+                    form.submit();
+                }
+            };
+        });
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

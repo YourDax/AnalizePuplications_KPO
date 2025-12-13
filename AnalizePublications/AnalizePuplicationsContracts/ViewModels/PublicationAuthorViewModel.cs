@@ -8,3 +8,10 @@ namespace AnalyzePublicationsContracts.ViewModels
     }
 }
 
+
+
+
+
+
+
+

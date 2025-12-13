@@ -22,6 +22,9 @@ builder.Services.AddScoped<IAuthorStorage, AuthorStorage>(); // ���� �
 builder.Services.AddScoped<IPublicationStorage, PublicationStorage>();
 builder.Services.AddScoped<ISourceStorage, SourceStorage>();
 
+// Регистрация сервисов для тестовых данных
+builder.Services.AddScoped<AnalyzePublicationsWeb.Services.TestDataGenerator>();
+
 // ----------------------
 var app = builder.Build();
 

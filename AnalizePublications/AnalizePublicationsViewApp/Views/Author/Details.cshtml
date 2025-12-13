@@ -1,0 +1,78 @@
+@model AnalyzePublicationsContracts.ViewModels.AuthorViewModel
+
+@{
+    ViewData["Title"] = "Детали автора";
+}
+
+<h2>Детали автора</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Полное имя:</dt>
+            <dd class="col-sm-8">@Model.FullName</dd>
+
+            <dt class="col-sm-4">Организация:</dt>
+            <dd class="col-sm-8">@Model.Affiliation</dd>
+
+            <dt class="col-sm-4">Email:</dt>
+            <dd class="col-sm-8">@Model.Email</dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        <h4>Метрики</h4>
+        <dl class="row">
+            <dt class="col-sm-6">Количество публикаций:</dt>
+            <dd class="col-sm-6">@Model.PublicationsCount</dd>
+
+            <dt class="col-sm-6">Количество соавторов:</dt>
+            <dd class="col-sm-6">@Model.CoauthorsCount</dd>
+
+            <dt class="col-sm-6">Количество цитирований:</dt>
+            <dd class="col-sm-6">@Model.CitationCount</dd>
+
+            <dt class="col-sm-6">H-индекс:</dt>
+            <dd class="col-sm-6">@Model.HIndex</dd>
+
+            <dt class="col-sm-6">Среднее число страниц:</dt>
+            <dd class="col-sm-6">@Model.AveragePages.ToString("F2")</dd>
+        </dl>
+    </div>
+</div>
+
+@if (ViewBag.Publications != null && ((List<AnalyzePublicationsContracts.ViewModels.PublicationViewModel>)ViewBag.Publications).Any())
+{
+    <h3 class="mt-4">Публикации автора</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Дата публикации</th>
+                <th>Тип</th>
+                <th>Цитирования</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pub in (List<AnalyzePublicationsContracts.ViewModels.PublicationViewModel>)ViewBag.Publications)
+            {
+                <tr>
+                    <td>@pub.Title</td>
+                    <td>@(pub.PublicationDate?.ToString("dd.MM.yyyy") ?? "Не указана")</td>
+                    <td>@pub.PublicationType</td>
+                    <td>@pub.CitationCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="mt-3">
+    <a href="@Url.Action("Browse")" class="btn btn-secondary">Назад к списку</a>
+</div>
+
+
+
+
+
+
+
