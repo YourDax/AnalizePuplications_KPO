@@ -115,14 +115,14 @@ namespace AnalizePuplicationsBusinessLogic.BusinessLogic
             if (string.IsNullOrEmpty(model.Title))
                 throw new ArgumentNullException(nameof(model.Title), "Не указано название публикации");
 
-            if (model.AuthorIds == null || model.AuthorIds.Count == 0)
+            if (model.Authors == null || model.Authors.Count == 0)
                 throw new ArgumentException("Публикация должна иметь хотя бы одного автора");
 
             if (model.SourceId <= 0)
                 throw new ArgumentException("Некорректный SourceId");
 
             _logger.LogInformation("Publication check. Title:{Title}, Authors:{Authors}, SourceId:{SourceId}, Id:{Id}",
-                 model.Title, string.Join(",", model.AuthorIds), model.SourceId, model.Id);
+                 model.Title, string.Join(",", model.Authors.Select(a => a.AuthorId)), model.SourceId, model.Id);
         }
     }
 }

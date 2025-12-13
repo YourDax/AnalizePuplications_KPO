@@ -14,8 +14,7 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         [Required]
         public string Title { get; set; } = string.Empty;
 
-        [Required]
-        public int Year { get; set; }
+        public DateTime? PublicationDate { get; set; }
 
         [Required]
         public PublicationType PublicationType { get; set; }
@@ -25,6 +24,12 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         public virtual Source? Source { get; set; }
 
         public string? Doi { get; set; }
+
+        public int? Pages { get; set; }
+
+        public string? Abstract { get; set; }
+
+        public string? Keywords { get; set; }
 
         [Required]
         public int CitationCount { get; set; }
@@ -41,10 +46,13 @@ namespace AnalyzePublicationsDatabaseImplement.Models
             return new Publication
             {
                 Title = model.Title,
-                Year = model.Year,
+                PublicationDate = model.PublicationDate,
                 PublicationType = model.PublicationType,
                 SourceId = model.SourceId,
                 Doi = model.Doi,
+                Pages = model.Pages,
+                Abstract = model.Abstract,
+                Keywords = model.Keywords,
                 CitationCount = model.CitationCount
             };
         }
@@ -54,10 +62,13 @@ namespace AnalyzePublicationsDatabaseImplement.Models
             if (model == null) return;
 
             Title = model.Title;
-            Year = model.Year;
+            PublicationDate = model.PublicationDate;
             PublicationType = model.PublicationType;
             SourceId = model.SourceId;
             Doi = model.Doi;
+            Pages = model.Pages;
+            Abstract = model.Abstract;
+            Keywords = model.Keywords;
             CitationCount = model.CitationCount;
         }
 
@@ -65,10 +76,13 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         {
             Id = Id,
             Title = Title,
-            Year = Year,
+            PublicationDate = PublicationDate,
             PublicationType = PublicationType,
             SourceId = SourceId,
             Doi = Doi,
+            Pages = Pages,
+            Abstract = Abstract,
+            Keywords = Keywords,
             CitationCount = CitationCount
         };
     }

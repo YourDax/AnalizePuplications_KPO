@@ -20,15 +20,24 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         [Required]
         public string Email { get; set; } = string.Empty;
 
-        // Метрики
-        public int PublicationsCount { get; set; }
-        public int CoauthorsCount { get; set; }
-        public int CitationCount { get; set; }
-        public int HIndex { get; set; }
-        public double AveragePages { get; set; }
-
         // Навигационные свойства
         public virtual List<PublicationAuthor> PublicationAuthors { get; set; } = new();
+
+        // Вычисляемые метрики (не хранятся в БД, вычисляются в Storage)
+        [NotMapped]
+        public int PublicationsCount { get; set; }
+
+        [NotMapped]
+        public int CoauthorsCount { get; set; }
+
+        [NotMapped]
+        public int CitationCount { get; set; }
+
+        [NotMapped]
+        public int HIndex { get; set; }
+
+        [NotMapped]
+        public double AveragePages { get; set; }
 
         // ---------------- Methods ----------------
 
@@ -40,12 +49,7 @@ namespace AnalyzePublicationsDatabaseImplement.Models
                 Id = model.Id,
                 FullName = model.FullName,
                 Affiliation = model.Affiliation,
-                Email = model.Email,
-                PublicationsCount = model.PublicationsCount,
-                CoauthorsCount = model.CoauthorsCount,
-                CitationCount = model.CitationCount,
-                HIndex = model.HIndex,
-                AveragePages = model.AveragePages
+                Email = model.Email
             };
         }
 
@@ -55,24 +59,20 @@ namespace AnalyzePublicationsDatabaseImplement.Models
             FullName = model.FullName;
             Affiliation = model.Affiliation;
             Email = model.Email;
-            PublicationsCount = model.PublicationsCount;
-            CoauthorsCount = model.CoauthorsCount;
-            CitationCount = model.CitationCount;
-            HIndex = model.HIndex;
-            AveragePages = model.AveragePages;
         }
 
-        public AuthorViewModel GetViewModel => new()
+        // GetViewModel будет вызываться из Storage с вычисленными метриками
+        public AuthorViewModel GetViewModel(int publicationsCount, int coauthorsCount, int citationCount, int hIndex, double averagePages) => new()
         {
             Id = Id,
             FullName = FullName,
             Affiliation = Affiliation,
             Email = Email,
-            PublicationsCount = PublicationsCount,
-            CoauthorsCount = CoauthorsCount,
-            CitationCount = CitationCount,
-            HIndex = HIndex,
-            AveragePages = AveragePages
+            PublicationsCount = publicationsCount,
+            CoauthorsCount = coauthorsCount,
+            CitationCount = citationCount,
+            HIndex = hIndex,
+            AveragePages = averagePages
         };
     }
 }

@@ -12,7 +12,7 @@ namespace AnalyzePublicationsContracts.BindingModels
 
         public string Email { get; set; } = string.Empty;
 
-        // Метрики
+        // Метрики (вычисляемые, не используются при создании/обновлении)
         public int PublicationsCount { get; set; }
         public int CoauthorsCount { get; set; }
         public int CitationCount { get; set; }

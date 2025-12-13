@@ -14,9 +14,9 @@ namespace AnalyzePublicationsDataModels.Models
         string Title { get; }
 
         /// <summary>
-        /// Год публикации
+        /// Дата публикации
         /// </summary>
-        int Year { get; }
+        DateTime? PublicationDate { get; }
 
         /// <summary>
         /// Тип публикации (журнал, конференция, патент...)
@@ -32,6 +32,21 @@ namespace AnalyzePublicationsDataModels.Models
         /// DOI уникальный идентификатор публикации
         /// </summary>
         string? Doi { get; }
+
+        /// <summary>
+        /// Количество страниц
+        /// </summary>
+        int? Pages { get; }
+
+        /// <summary>
+        /// Аннотация/Abstract публикации
+        /// </summary>
+        string? Abstract { get; }
+
+        /// <summary>
+        /// Ключевые слова
+        /// </summary>
+        string? Keywords { get; }
 
         /// <summary>
         /// Число цитирований данной публикации.

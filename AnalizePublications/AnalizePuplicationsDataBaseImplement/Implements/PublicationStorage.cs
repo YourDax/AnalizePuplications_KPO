@@ -4,6 +4,7 @@ using AnalyzePublicationsContracts.StorageContracts;
 using AnalyzePublicationsContracts.ViewModels;
 using AnalyzePublicationsDatabaseImplement.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AnalyzePublicationsDatabaseImplement.Implements
 {
@@ -15,16 +16,25 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             return context.Publications
                 .Include(x => x.Source)
                 .Include(x => x.PublicationAuthors)
+                    .ThenInclude(pa => pa.Author)
                 .Select(x => new PublicationViewModel
                 {
                     Id = x.Id,
                     Title = x.Title,
-                    Year = x.Year,
+                    PublicationDate = x.PublicationDate,
                     PublicationType = x.PublicationType,
                     SourceId = x.SourceId,
                     Doi = x.Doi,
+                    Pages = x.Pages,
+                    Abstract = x.Abstract,
+                    Keywords = x.Keywords,
                     CitationCount = x.CitationCount,
-                    AuthorIds = x.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                    Authors = x.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                    {
+                        AuthorId = pa.AuthorId,
+                        AuthorName = pa.Author.FullName,
+                        AuthorContribution = pa.AuthorContribution
+                    }).ToList()
                 })
                 .ToList();
         }
@@ -37,13 +47,16 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
             var query = context.Publications
                 .Include(p => p.Source)
-                .Include(p => p.PublicationAuthors) // подгружаем связи с авторами
+                .Include(p => p.PublicationAuthors)
+                    .ThenInclude(pa => pa.Author)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(model.Title))
                 query = query.Where(x => x.Title.Contains(model.Title));
-            if (model.Year.HasValue)
-                query = query.Where(x => x.Year == model.Year.Value);
+            if (model.PublicationDateFrom.HasValue)
+                query = query.Where(x => x.PublicationDate.HasValue && x.PublicationDate >= model.PublicationDateFrom.Value);
+            if (model.PublicationDateTo.HasValue)
+                query = query.Where(x => x.PublicationDate.HasValue && x.PublicationDate <= model.PublicationDateTo.Value);
             if (model.SourceId.HasValue)
                 query = query.Where(x => x.SourceId == model.SourceId.Value);
 
@@ -52,12 +65,20 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 {
                     Id = x.Id,
                     Title = x.Title,
-                    Year = x.Year,
+                    PublicationDate = x.PublicationDate,
                     PublicationType = x.PublicationType,
                     SourceId = x.SourceId,
                     Doi = x.Doi,
+                    Pages = x.Pages,
+                    Abstract = x.Abstract,
+                    Keywords = x.Keywords,
                     CitationCount = x.CitationCount,
-                    AuthorIds = x.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                    Authors = x.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                    {
+                        AuthorId = pa.AuthorId,
+                        AuthorName = pa.Author.FullName,
+                        AuthorContribution = pa.AuthorContribution
+                    }).ToList()
                 })
                 .ToList();
         }
@@ -71,6 +92,7 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             var query = context.Publications
                 .Include(p => p.Source)
                 .Include(p => p.PublicationAuthors)
+                    .ThenInclude(pa => pa.Author)
                 .AsQueryable();
 
             Publication? entity = null;
@@ -87,12 +109,20 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             {
                 Id = entity.Id,
                 Title = entity.Title,
-                Year = entity.Year,
+                PublicationDate = entity.PublicationDate,
                 PublicationType = entity.PublicationType,
                 SourceId = entity.SourceId,
                 Doi = entity.Doi,
+                Pages = entity.Pages,
+                Abstract = entity.Abstract,
+                Keywords = entity.Keywords,
                 CitationCount = entity.CitationCount,
-                AuthorIds = entity.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                Authors = entity.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                {
+                    AuthorId = pa.AuthorId,
+                    AuthorName = pa.Author.FullName,
+                    AuthorContribution = pa.AuthorContribution
+                }).ToList()
             };
         }
 
@@ -110,15 +140,16 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 context.Publications.Add(entity);
                 context.SaveChanges();
 
-                // создаём связи с авторами
-                if (model.AuthorIds != null && model.AuthorIds.Count > 0)
+                // создаём связи с авторами и их вкладом
+                if (model.Authors != null && model.Authors.Count > 0)
                 {
-                    foreach (var authorId in model.AuthorIds)
+                    foreach (var author in model.Authors)
                     {
                         context.PublicationAuthors.Add(new PublicationAuthor
                         {
                             PublicationId = entity.Id,
-                            AuthorId = authorId
+                            AuthorId = author.AuthorId,
+                            AuthorContribution = author.AuthorContribution
                         });
                     }
                     context.SaveChanges();
@@ -127,6 +158,7 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 // Перезагружаем entity с авторами для получения полного ViewModel
                 entity = context.Publications
                     .Include(p => p.PublicationAuthors)
+                        .ThenInclude(pa => pa.Author)
                     .FirstOrDefault(p => p.Id == entity.Id);
 
                 if (entity == null) return null;
@@ -135,12 +167,20 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 {
                     Id = entity.Id,
                     Title = entity.Title,
-                    Year = entity.Year,
+                    PublicationDate = entity.PublicationDate,
                     PublicationType = entity.PublicationType,
                     SourceId = entity.SourceId,
                     Doi = entity.Doi,
+                    Pages = entity.Pages,
+                    Abstract = entity.Abstract,
+                    Keywords = entity.Keywords,
                     CitationCount = entity.CitationCount,
-                    AuthorIds = entity.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                    Authors = entity.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                    {
+                        AuthorId = pa.AuthorId,
+                        AuthorName = pa.Author.FullName,
+                        AuthorContribution = pa.AuthorContribution
+                    }).ToList()
                 };
             }
             catch
@@ -168,31 +208,48 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 context.PublicationAuthors.RemoveRange(entity.PublicationAuthors);
                 context.SaveChanges();
 
-                // добавляем новые связи
-                if (model.AuthorIds != null && model.AuthorIds.Count > 0)
+                // добавляем новые связи с вкладом авторов
+                if (model.Authors != null && model.Authors.Count > 0)
                 {
-                    foreach (var authorId in model.AuthorIds)
+                    foreach (var author in model.Authors)
                     {
                         context.PublicationAuthors.Add(new PublicationAuthor
                         {
                             PublicationId = entity.Id,
-                            AuthorId = authorId
+                            AuthorId = author.AuthorId,
+                            AuthorContribution = author.AuthorContribution
                         });
                     }
                 }
 
                 context.SaveChanges();
 
+                // Перезагружаем с авторами
+                entity = context.Publications
+                    .Include(p => p.PublicationAuthors)
+                        .ThenInclude(pa => pa.Author)
+                    .FirstOrDefault(p => p.Id == entity.Id);
+
+                if (entity == null) return null;
+
                 return new PublicationViewModel
                 {
                     Id = entity.Id,
                     Title = entity.Title,
-                    Year = entity.Year,
+                    PublicationDate = entity.PublicationDate,
                     PublicationType = entity.PublicationType,
                     SourceId = entity.SourceId,
                     Doi = entity.Doi,
+                    Pages = entity.Pages,
+                    Abstract = entity.Abstract,
+                    Keywords = entity.Keywords,
                     CitationCount = entity.CitationCount,
-                    AuthorIds = entity.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                    Authors = entity.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                    {
+                        AuthorId = pa.AuthorId,
+                        AuthorName = pa.Author.FullName,
+                        AuthorContribution = pa.AuthorContribution
+                    }).ToList()
                 };
             }
             catch
@@ -209,12 +266,35 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             try
             {
                 using var context = new PublicationsDatabase();
-                var entity = context.Publications.FirstOrDefault(x => x.Id == model.Id);
+                var entity = context.Publications
+                    .Include(p => p.PublicationAuthors)
+                        .ThenInclude(pa => pa.Author)
+                    .FirstOrDefault(x => x.Id == model.Id);
                 if (entity == null) return null;
+
+                var viewModel = new PublicationViewModel
+                {
+                    Id = entity.Id,
+                    Title = entity.Title,
+                    PublicationDate = entity.PublicationDate,
+                    PublicationType = entity.PublicationType,
+                    SourceId = entity.SourceId,
+                    Doi = entity.Doi,
+                    Pages = entity.Pages,
+                    Abstract = entity.Abstract,
+                    Keywords = entity.Keywords,
+                    CitationCount = entity.CitationCount,
+                    Authors = entity.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                    {
+                        AuthorId = pa.AuthorId,
+                        AuthorName = pa.Author.FullName,
+                        AuthorContribution = pa.AuthorContribution
+                    }).ToList()
+                };
 
                 context.Publications.Remove(entity);
                 context.SaveChanges();
-                return entity.GetViewModel;
+                return viewModel;
             }
             catch
             {
@@ -229,18 +309,27 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             return context.Publications
                 .Include(p => p.Source)
                 .Include(p => p.PublicationAuthors)
+                    .ThenInclude(pa => pa.Author)
                 .Where(p => p.PublicationAuthors
                     .Any(pa => pa.AuthorId == authorId))
                 .Select(p => new PublicationViewModel
                 {
                     Id = p.Id,
                     Title = p.Title,
-                    Year = p.Year,
+                    PublicationDate = p.PublicationDate,
                     PublicationType = p.PublicationType,
                     SourceId = p.SourceId,
                     Doi = p.Doi,
+                    Pages = p.Pages,
+                    Abstract = p.Abstract,
+                    Keywords = p.Keywords,
                     CitationCount = p.CitationCount,
-                    AuthorIds = p.PublicationAuthors.Select(pa => pa.AuthorId).ToList()
+                    Authors = p.PublicationAuthors.Select(pa => new PublicationAuthorViewModel
+                    {
+                        AuthorId = pa.AuthorId,
+                        AuthorName = pa.Author.FullName,
+                        AuthorContribution = pa.AuthorContribution
+                    }).ToList()
                 })
                 .ToList();
         }

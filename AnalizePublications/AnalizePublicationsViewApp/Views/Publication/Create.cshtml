@@ -1,5 +1,5 @@
 ﻿@using AnalyzePublicationsDataModels.Enums
-@model AnalyzePublicationsContracts.ViewModels.PublicationViewModel
+@model AnalyzePublicationsContracts.BindingModels.PublicationBindingModel
 
 @{
     ViewData["Title"] = "Добавить публикацию";
@@ -16,9 +16,9 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Year"></label>
-        <input asp-for="Year" class="form-control" />
-        <span asp-validation-for="Year" class="text-danger"></span>
+        <label asp-for="PublicationDate">Дата публикации</label>
+        <input asp-for="PublicationDate" type="date" class="form-control" />
+        <span asp-validation-for="PublicationDate" class="text-danger"></span>
     </div>
 
     <!-- ENUM PublicationType -->
@@ -43,21 +43,86 @@
     </div>
 
     <div class="form-group">
-        <label asp-for="Doi"></label>
+        <label asp-for="Doi">DOI</label>
         <input asp-for="Doi" class="form-control" />
         <span asp-validation-for="Doi" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="CitationCount"></label>
-        <input asp-for="CitationCount" class="form-control" />
+        <label asp-for="Pages">Количество страниц</label>
+        <input asp-for="Pages" type="number" class="form-control" />
+        <span asp-validation-for="Pages" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Abstract">Аннотация</label>
+        <textarea asp-for="Abstract" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Abstract" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Keywords">Ключевые слова</label>
+        <input asp-for="Keywords" class="form-control" />
+        <span asp-validation-for="Keywords" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CitationCount">Количество цитирований</label>
+        <input asp-for="CitationCount" type="number" class="form-control" />
         <span asp-validation-for="CitationCount" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label>Авторы</label>
-        <select asp-for="AuthorIds" asp-items="ViewBag.Authors" class="form-control" multiple></select>
+        <div id="authors-container">
+            <div class="author-item mb-2">
+                <select name="Authors[0].AuthorId" asp-items="ViewBag.Authors" class="form-control d-inline-block" style="width: 200px;">
+                    <option value="">Выберите автора</option>
+                </select>
+                <input type="text" name="Authors[0].AuthorContribution" placeholder="Вклад автора (опционально)" 
+                       class="form-control d-inline-block" style="width: 300px; margin-left: 10px;" />
+                <button type="button" class="btn btn-sm btn-danger remove-author" style="margin-left: 10px;">Удалить</button>
+            </div>
+        </div>
+        <button type="button" id="add-author" class="btn btn-sm btn-secondary mt-2">Добавить автора</button>
     </div>
 
     <button type="submit" class="btn btn-primary">Создать</button>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let authorIndex = 1;
+        
+        document.getElementById('add-author').addEventListener('click', function() {
+            const container = document.getElementById('authors-container');
+            const newAuthor = document.createElement('div');
+            newAuthor.className = 'author-item mb-2';
+            newAuthor.innerHTML = `
+                <select name="Authors[${authorIndex}].AuthorId" asp-items="ViewBag.Authors" class="form-control d-inline-block" style="width: 200px;">
+                    <option value="">Выберите автора</option>
+                    @foreach (var author in ViewBag.Authors as List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)
+                    {
+                        <option value="@author.Value">@author.Text</option>
+                    }
+                </select>
+                <input type="text" name="Authors[${authorIndex}].AuthorContribution" placeholder="Вклад автора (опционально)" 
+                       class="form-control d-inline-block" style="width: 300px; margin-left: 10px;" />
+                <button type="button" class="btn btn-sm btn-danger remove-author" style="margin-left: 10px;">Удалить</button>
+            `;
+            container.appendChild(newAuthor);
+            authorIndex++;
+        });
+        
+        document.getElementById('authors-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-author')) {
+                const authorItems = document.querySelectorAll('.author-item');
+                if (authorItems.length > 1) {
+                    e.target.closest('.author-item').remove();
+                } else {
+                    alert('Публикация должна иметь хотя бы одного автора');
+                }
+            }
+        });
+    });
+</script>

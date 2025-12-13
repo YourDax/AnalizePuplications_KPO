@@ -16,5 +16,10 @@ namespace AnalyzePublicationsDataModels.Models
         /// ID публикации
         /// </summary>
         int PublicationId { get; }
+
+        /// <summary>
+        /// Вклад автора (процент или описание)
+        /// </summary>
+        string? AuthorContribution { get; }
     }
 }

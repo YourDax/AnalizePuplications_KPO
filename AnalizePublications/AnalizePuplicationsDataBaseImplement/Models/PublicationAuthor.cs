@@ -17,5 +17,7 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         public int AuthorId { get; set; }
 
         public virtual Author Author { get; set; } = null!;
+
+        public string? AuthorContribution { get; set; }
     }
 }

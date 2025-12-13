@@ -9,12 +9,13 @@
         <tr>
             <th>Id</th>
             <th>Название</th>
-            <th>Год</th>
+            <th>Дата публикации</th>
             <th>Тип</th>
             <th>Источник</th>
             <th>DOI</th>
+            <th>Страниц</th>
             <th>Цитирования</th>
-            <th>Авторы (Id)</th>
+            <th>Авторы</th>
             <th></th>
         </tr>
     </thead>
@@ -25,12 +26,13 @@
             <tr>
                 <td>@p.Id</td>
                 <td>@p.Title</td>
-                <td>@p.Year</td>
+                <td>@(p.PublicationDate?.ToString("dd.MM.yyyy") ?? "Не указана")</td>
                 <td>@p.PublicationType</td>
                 <td>@p.SourceId</td>
                 <td>@p.Doi</td>
+                <td>@(p.Pages?.ToString() ?? "-")</td>
                 <td>@p.CitationCount</td>
-                <td>@string.Join(", ", p.AuthorIds)</td>
+                <td>@string.Join(", ", p.Authors?.Select(a => a.AuthorName) ?? new List<string>())</td>
                 <td>
                     <a href="/Publication/Edit/@p.Id">Редактировать</a> |
                     <a href="/Publication/Delete/@p.Id">Удалить</a>

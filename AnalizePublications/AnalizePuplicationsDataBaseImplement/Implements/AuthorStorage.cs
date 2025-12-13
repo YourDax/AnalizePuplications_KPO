@@ -13,7 +13,10 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
         {
             using var context = new PublicationsDatabase();
             return context.Authors
-                .Select(x => x.GetViewModel)
+                .Include(a => a.PublicationAuthors)
+                    .ThenInclude(pa => pa.Publication)
+                .ToList()
+                .Select(a => CalculateMetricsAndCreateViewModel(context, a))
                 .ToList();
         }
 
@@ -22,14 +25,19 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             if (model == null) return GetFullList();
 
             using var context = new PublicationsDatabase();
-            var query = context.Authors.AsQueryable();
+            var query = context.Authors
+                .Include(a => a.PublicationAuthors)
+                    .ThenInclude(pa => pa.Publication)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(model.FullName))
                 query = query.Where(x => x.FullName.Contains(model.FullName));
             if (!string.IsNullOrEmpty(model.Affiliation))
                 query = query.Where(x => x.Affiliation.Contains(model.Affiliation));
 
-            return query.Select(x => x.GetViewModel).ToList();
+            return query.ToList()
+                .Select(a => CalculateMetricsAndCreateViewModel(context, a))
+                .ToList();
         }
 
         public AuthorViewModel? GetElement(AuthorSearchModel model)
@@ -37,18 +45,26 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             if (model == null) return null;
 
             using var context = new PublicationsDatabase();
+            Author? entity = null;
 
             if (!string.IsNullOrEmpty(model.FullName))
             {
-                return context.Authors.FirstOrDefault(x => x.FullName == model.FullName)?.GetViewModel;
+                entity = context.Authors
+                    .Include(a => a.PublicationAuthors)
+                        .ThenInclude(pa => pa.Publication)
+                    .FirstOrDefault(x => x.FullName == model.FullName);
             }
-
-            if (model.Id.HasValue)
+            else if (model.Id.HasValue)
             {
-                return context.Authors.FirstOrDefault(x => x.Id == model.Id.Value)?.GetViewModel;
+                entity = context.Authors
+                    .Include(a => a.PublicationAuthors)
+                        .ThenInclude(pa => pa.Publication)
+                    .FirstOrDefault(x => x.Id == model.Id.Value);
             }
 
-            return null;
+            if (entity == null) return null;
+
+            return CalculateMetricsAndCreateViewModel(context, entity);
         }
 
         public AuthorViewModel? Insert(AuthorBindingModel model)
@@ -63,7 +79,16 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
                 context.Authors.Add(entity);
                 context.SaveChanges();
-                return entity.GetViewModel;
+
+                // Перезагружаем с навигационными свойствами для вычисления метрик
+                entity = context.Authors
+                    .Include(a => a.PublicationAuthors)
+                        .ThenInclude(pa => pa.Publication)
+                    .FirstOrDefault(a => a.Id == entity.Id);
+
+                if (entity == null) return null;
+
+                return CalculateMetricsAndCreateViewModel(context, entity);
             }
             catch
             {
@@ -78,12 +103,16 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             try
             {
                 using var context = new PublicationsDatabase();
-                var entity = context.Authors.FirstOrDefault(x => x.Id == model.Id);
+                var entity = context.Authors
+                    .Include(a => a.PublicationAuthors)
+                        .ThenInclude(pa => pa.Publication)
+                    .FirstOrDefault(x => x.Id == model.Id);
                 if (entity == null) return null;
 
                 entity.Update(model);
                 context.SaveChanges();
-                return entity.GetViewModel;
+
+                return CalculateMetricsAndCreateViewModel(context, entity);
             }
             catch
             {
@@ -98,17 +127,88 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
             try
             {
                 using var context = new PublicationsDatabase();
-                var entity = context.Authors.FirstOrDefault(x => x.Id == model.Id);
+                var entity = context.Authors
+                    .Include(a => a.PublicationAuthors)
+                        .ThenInclude(pa => pa.Publication)
+                    .FirstOrDefault(x => x.Id == model.Id);
                 if (entity == null) return null;
 
+                var viewModel = CalculateMetricsAndCreateViewModel(context, entity);
                 context.Authors.Remove(entity);
                 context.SaveChanges();
-                return entity.GetViewModel;
+                return viewModel;
             }
             catch
             {
                 return null;
             }
+        }
+
+        private AuthorViewModel CalculateMetricsAndCreateViewModel(PublicationsDatabase context, Author author)
+        {
+            var publicationIds = author.PublicationAuthors?
+                .Select(pa => pa.PublicationId)
+                .Distinct()
+                .ToList() ?? new List<int>();
+
+            var publicationsCount = publicationIds.Count;
+
+            // Подсчет соавторов
+            var coauthorsCount = 0;
+            if (publicationIds.Any())
+            {
+                var allAuthorIds = context.PublicationAuthors
+                    .Where(pa => publicationIds.Contains(pa.PublicationId) && pa.AuthorId != author.Id)
+                    .Select(pa => pa.AuthorId)
+                    .Distinct()
+                    .Count();
+                coauthorsCount = allAuthorIds;
+            }
+
+            // Подсчет цитирований
+            var citationCount = 0;
+            if (publicationIds.Any())
+            {
+                citationCount = context.Publications
+                    .Where(p => publicationIds.Contains(p.Id))
+                    .Sum(p => p.CitationCount);
+            }
+
+            // Вычисление H-индекса
+            var hIndex = 0;
+            if (publicationIds.Any())
+            {
+                var citations = context.Publications
+                    .Where(p => publicationIds.Contains(p.Id))
+                    .Select(p => p.CitationCount)
+                    .OrderByDescending(c => c)
+                    .ToList();
+
+                for (int i = 0; i < citations.Count; i++)
+                {
+                    if (citations[i] >= i + 1)
+                        hIndex = i + 1;
+                    else
+                        break;
+                }
+            }
+
+            // Среднее количество страниц
+            var averagePages = 0.0;
+            if (publicationIds.Any())
+            {
+                var pagesList = context.Publications
+                    .Where(p => publicationIds.Contains(p.Id) && p.Pages.HasValue)
+                    .Select(p => p.Pages!.Value)
+                    .ToList();
+
+                if (pagesList.Any())
+                {
+                    averagePages = pagesList.Average();
+                }
+            }
+
+            return author.GetViewModel(publicationsCount, coauthorsCount, citationCount, hIndex, averagePages);
         }
     }
 }

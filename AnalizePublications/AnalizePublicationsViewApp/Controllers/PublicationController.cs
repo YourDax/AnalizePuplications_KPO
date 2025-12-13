@@ -74,11 +74,18 @@ namespace AnalyzePublicationsWeb.Controllers
             {
                 Id = publication.Id,
                 Title = publication.Title,
-                Year = publication.Year,
+                PublicationDate = publication.PublicationDate,
                 PublicationType = publication.PublicationType,
-                AuthorIds = publication.AuthorIds,
+                Authors = publication.Authors?.Select(a => new PublicationAuthorBindingModel
+                {
+                    AuthorId = a.AuthorId,
+                    AuthorContribution = a.AuthorContribution
+                }).ToList() ?? new List<PublicationAuthorBindingModel>(),
                 SourceId = publication.SourceId,
                 Doi = publication.Doi,
+                Pages = publication.Pages,
+                Abstract = publication.Abstract,
+                Keywords = publication.Keywords,
                 CitationCount = publication.CitationCount
             });
         }

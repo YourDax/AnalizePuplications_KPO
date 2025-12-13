@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AnalizePuplicationsDataBaseImplement.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialcreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,12 +20,7 @@ namespace AnalizePuplicationsDataBaseImplement.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FullName = table.Column<string>(type: "text", nullable: false),
                     Affiliation = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    PublicationsCount = table.Column<int>(type: "integer", nullable: false),
-                    CoauthorsCount = table.Column<int>(type: "integer", nullable: false),
-                    CitationCount = table.Column<int>(type: "integer", nullable: false),
-                    HIndex = table.Column<int>(type: "integer", nullable: false),
-                    AveragePages = table.Column<double>(type: "double precision", nullable: false)
+                    Email = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -53,10 +49,13 @@ namespace AnalizePuplicationsDataBaseImplement.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Title = table.Column<string>(type: "text", nullable: false),
-                    Year = table.Column<int>(type: "integer", nullable: false),
+                    PublicationDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     PublicationType = table.Column<int>(type: "integer", nullable: false),
                     SourceId = table.Column<int>(type: "integer", nullable: false),
                     Doi = table.Column<string>(type: "text", nullable: true),
+                    Pages = table.Column<int>(type: "integer", nullable: true),
+                    Abstract = table.Column<string>(type: "text", nullable: true),
+                    Keywords = table.Column<string>(type: "text", nullable: true),
                     CitationCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -77,7 +76,8 @@ namespace AnalizePuplicationsDataBaseImplement.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PublicationId = table.Column<int>(type: "integer", nullable: false),
-                    AuthorId = table.Column<int>(type: "integer", nullable: false)
+                    AuthorId = table.Column<int>(type: "integer", nullable: false),
+                    AuthorContribution = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
