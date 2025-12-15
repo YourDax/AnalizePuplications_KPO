@@ -31,5 +31,24 @@ namespace AnalyzePublicationsContracts.ViewModels
 
         [DisplayName("Среднее число страниц")]
         public double AveragePages { get; set; }
+
+        // Дополнительные метрики
+        [DisplayName("i10-индекс")]
+        public int I10Index { get; set; }
+
+        [DisplayName("Средние цитирования на публикацию")]
+        public double AverageCitationsPerPublication { get; set; }
+
+        [DisplayName("Общее количество страниц")]
+        public int TotalPages { get; set; }
+
+        [DisplayName("Индекс продуктивности")]
+        public double ProductivityIndex { get; set; }
+
+        [DisplayName("Максимальное количество цитирований")]
+        public int MaxCitations { get; set; }
+
+        [DisplayName("Минимальное количество цитирований")]
+        public int MinCitations { get; set; }
     }
 }

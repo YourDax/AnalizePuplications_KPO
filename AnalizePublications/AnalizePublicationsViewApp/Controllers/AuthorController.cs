@@ -3,6 +3,8 @@ using AnalizePuplicationsContracts.BusinessLogicContracts;
 using AnalyzePublicationsContracts.BindingModels;
 using AnalyzePublicationsContracts.SearchModels;
 using AnalyzePublicationsContracts.ViewModels;
+using AnalyzePublicationsWeb.Services;
+using AnalyzePublicationsDataModels.Enums;
 using System;
 
 namespace AnalyzePublicationsWeb.Controllers
@@ -11,11 +13,13 @@ namespace AnalyzePublicationsWeb.Controllers
     {
         private readonly IAuthorLogic _authorLogic;
         private readonly IPublicationLogic _publicationLogic;
+        private readonly AuthorReportExportService _exportService;
 
-        public AuthorController(IAuthorLogic authorLogic, IPublicationLogic publicationLogic)
+        public AuthorController(IAuthorLogic authorLogic, IPublicationLogic publicationLogic, AuthorReportExportService exportService)
         {
             _authorLogic = authorLogic;
             _publicationLogic = publicationLogic;
+            _exportService = exportService;
         }
 
         // Редактирование - список для управления
@@ -94,6 +98,18 @@ namespace AnalyzePublicationsWeb.Controllers
                 "averagepages" => isAscending
                     ? authors.OrderBy(a => a.AveragePages).ToList()
                     : authors.OrderByDescending(a => a.AveragePages).ToList(),
+                "i10index" => isAscending
+                    ? authors.OrderBy(a => a.I10Index).ToList()
+                    : authors.OrderByDescending(a => a.I10Index).ToList(),
+                "averagecitationsperpublication" => isAscending
+                    ? authors.OrderBy(a => a.AverageCitationsPerPublication).ToList()
+                    : authors.OrderByDescending(a => a.AverageCitationsPerPublication).ToList(),
+                "totalpages" => isAscending
+                    ? authors.OrderBy(a => a.TotalPages).ToList()
+                    : authors.OrderByDescending(a => a.TotalPages).ToList(),
+                "productivityindex" => isAscending
+                    ? authors.OrderBy(a => a.ProductivityIndex).ToList()
+                    : authors.OrderByDescending(a => a.ProductivityIndex).ToList(),
                 _ => authors
             };
         }
@@ -183,7 +199,7 @@ namespace AnalyzePublicationsWeb.Controllers
         }
 
         // Детальная информация об авторе
-        public IActionResult Details(int id)
+        public IActionResult Details(int id, bool generateReport = false)
         {
             var author = _authorLogic.ReadElement(new AuthorSearchModel { Id = id });
             if (author == null) return NotFound();
@@ -192,7 +208,97 @@ namespace AnalyzePublicationsWeb.Controllers
             var publications = _publicationLogic?.ReadListByAuthor(id) ?? new List<PublicationViewModel>();
             ViewBag.Publications = publications;
 
+            // Формируем отчет, если запрошен
+            if (generateReport)
+            {
+                var report = new AuthorReportViewModel
+                {
+                    Author = author,
+                    Publications = publications,
+                    ReportDate = DateTime.Now
+                };
+
+                // Статистика по типам публикаций
+                report.PublicationsByType = publications
+                    .GroupBy(p => p.PublicationType)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                // Статистика по годам
+                report.PublicationsByYear = publications
+                    .Where(p => p.PublicationDate.HasValue)
+                    .GroupBy(p => p.PublicationDate!.Value.Year)
+                    .ToDictionary(g => g.Key, g => g.Count());
+
+                // Топ публикаций по цитированиям (топ 10)
+                report.TopCitedPublications = publications
+                    .OrderByDescending(p => p.CitationCount)
+                    .Take(10)
+                    .ToList();
+
+                ViewBag.Report = report;
+            }
+
             return View(author);
+        }
+
+        // Экспорт отчета
+        public IActionResult ExportReport(int id, string format)
+        {
+            var author = _authorLogic.ReadElement(new AuthorSearchModel { Id = id });
+            if (author == null) return NotFound();
+
+            var publications = _publicationLogic?.ReadListByAuthor(id) ?? new List<PublicationViewModel>();
+
+            var report = new AuthorReportViewModel
+            {
+                Author = author,
+                Publications = publications,
+                ReportDate = DateTime.Now
+            };
+
+            // Статистика по типам публикаций
+            report.PublicationsByType = publications
+                .GroupBy(p => p.PublicationType)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Статистика по годам
+            report.PublicationsByYear = publications
+                .Where(p => p.PublicationDate.HasValue)
+                .GroupBy(p => p.PublicationDate!.Value.Year)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Топ публикаций по цитированиям
+            report.TopCitedPublications = publications
+                .OrderByDescending(p => p.CitationCount)
+                .Take(10)
+                .ToList();
+
+            byte[] fileBytes;
+            string contentType;
+            string fileName;
+
+            switch (format?.ToLower())
+            {
+                case "pdf":
+                    fileBytes = _exportService.ExportToPdf(report);
+                    contentType = "application/pdf";
+                    fileName = $"Отчет_{author.FullName}_{DateTime.Now:yyyyMMdd}.pdf";
+                    break;
+                case "word":
+                    fileBytes = _exportService.ExportToWord(report);
+                    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    fileName = $"Отчет_{author.FullName}_{DateTime.Now:yyyyMMdd}.docx";
+                    break;
+                case "excel":
+                    fileBytes = _exportService.ExportToExcel(report);
+                    contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    fileName = $"Отчет_{author.FullName}_{DateTime.Now:yyyyMMdd}.xlsx";
+                    break;
+                default:
+                    return BadRequest("Неподдерживаемый формат экспорта");
+            }
+
+            return File(fileBytes, contentType, fileName);
         }
     }
 }

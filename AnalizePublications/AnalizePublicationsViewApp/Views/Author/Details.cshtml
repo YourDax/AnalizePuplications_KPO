@@ -1,10 +1,19 @@
 @model AnalyzePublicationsContracts.ViewModels.AuthorViewModel
+@using AnalyzePublicationsContracts.ViewModels
 
 @{
     ViewData["Title"] = "Детали автора";
+    var report = ViewBag.Report as AuthorReportViewModel;
 }
 
 <h2>Детали автора</h2>
+
+<div class="mb-3">
+    <a href="@Url.Action("Details", new { id = Model.Id, generateReport = true })" class="btn btn-primary">
+        @(report != null ? "Обновить отчет" : "Сформировать отчет")
+    </a>
+    <a href="@Url.Action("Browse")" class="btn btn-secondary">Назад к списку</a>
+</div>
 
 <div class="row">
     <div class="col-md-6">
@@ -31,18 +40,144 @@
             <dt class="col-sm-6">Количество цитирований:</dt>
             <dd class="col-sm-6">@Model.CitationCount</dd>
 
-            <dt class="col-sm-6">H-индекс:</dt>
+            <dt class="col-sm-6">
+                H-индекс:
+                <span class="badge bg-info text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                      title="H-индекс - это показатель, который показывает, что у автора есть h публикаций, каждая из которых была процитирована не менее h раз. Вычисляется путем упорядочивания публикаций по убыванию количества цитирований и нахождения максимального числа h, при котором h публикаций имеют не менее h цитирований каждая.">
+                    ℹ️
+                </span>
+            </dt>
             <dd class="col-sm-6">@Model.HIndex</dd>
+
+            <dt class="col-sm-6">
+                i10-индекс:
+                <span class="badge bg-info text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                      title="i10-индекс - это количество публикаций автора, которые получили не менее 10 цитирований каждая. Это упрощенный показатель, введенный Google Scholar для оценки продуктивности исследователя.">
+                    ℹ️
+                </span>
+            </dt>
+            <dd class="col-sm-6">@Model.I10Index</dd>
+
+            <dt class="col-sm-6">Средние цитирования на публикацию:</dt>
+            <dd class="col-sm-6">@Model.AverageCitationsPerPublication.ToString("F2")</dd>
 
             <dt class="col-sm-6">Среднее число страниц:</dt>
             <dd class="col-sm-6">@Model.AveragePages.ToString("F2")</dd>
+
+            <dt class="col-sm-6">Общее количество страниц:</dt>
+            <dd class="col-sm-6">@Model.TotalPages</dd>
+
+            <dt class="col-sm-6">
+                Индекс продуктивности:
+                <span class="badge bg-info text-dark ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                      title="Индекс продуктивности показывает среднее количество публикаций в год. Вычисляется как отношение общего количества публикаций к количеству лет научной активности автора (разница между годом первой и последней публикации плюс 1).">
+                    ℹ️
+                </span>
+            </dt>
+            <dd class="col-sm-6">@Model.ProductivityIndex.ToString("F2")</dd>
+
+            <dt class="col-sm-6">Максимальное количество цитирований:</dt>
+            <dd class="col-sm-6">@Model.MaxCitations</dd>
+
+            <dt class="col-sm-6">Минимальное количество цитирований:</dt>
+            <dd class="col-sm-6">@Model.MinCitations</dd>
         </dl>
     </div>
 </div>
 
+@if (report != null)
+{
+    <div class="mt-4">
+        <h3>Предварительный отчет</h3>
+        <p class="text-muted">Дата формирования: @report.ReportDate.ToString("dd.MM.yyyy HH:mm")</p>
+        
+        <div class="mb-3">
+            <a href="@Url.Action("ExportReport", new { id = Model.Id, format = "pdf" })" class="btn btn-danger">
+                <i class="bi bi-file-pdf"></i> Экспорт в PDF
+            </a>
+            <a href="@Url.Action("ExportReport", new { id = Model.Id, format = "word" })" class="btn btn-primary">
+                <i class="bi bi-file-word"></i> Экспорт в Word
+            </a>
+            <a href="@Url.Action("ExportReport", new { id = Model.Id, format = "excel" })" class="btn btn-success">
+                <i class="bi bi-file-excel"></i> Экспорт в Excel
+            </a>
+        </div>
+
+        @if (report.PublicationsByType.Any())
+        {
+            <h4>Статистика по типам публикаций</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Тип публикации</th>
+                        <th>Количество</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in report.PublicationsByType)
+                    {
+                        <tr>
+                            <td>@item.Key</td>
+                            <td>@item.Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (report.PublicationsByYear.Any())
+        {
+            <h4>Статистика по годам</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Год</th>
+                        <th>Количество публикаций</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in report.PublicationsByYear.OrderBy(x => x.Key))
+                    {
+                        <tr>
+                            <td>@item.Key</td>
+                            <td>@item.Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (report.TopCitedPublications.Any())
+        {
+            <h4>Топ публикаций по цитированиям</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Дата публикации</th>
+                        <th>Тип</th>
+                        <th>Цитирования</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pub in report.TopCitedPublications)
+                    {
+                        <tr>
+                            <td>@pub.Title</td>
+                            <td>@(pub.PublicationDate?.ToString("dd.MM.yyyy") ?? "Не указана")</td>
+                            <td>@pub.PublicationType</td>
+                            <td>@pub.CitationCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+}
+
 @if (ViewBag.Publications != null && ((List<AnalyzePublicationsContracts.ViewModels.PublicationViewModel>)ViewBag.Publications).Any())
 {
-    <h3 class="mt-4">Публикации автора</h3>
+    <h3 class="mt-4">Все публикации автора</h3>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -66,9 +201,17 @@
     </table>
 }
 
-<div class="mt-3">
-    <a href="@Url.Action("Browse")" class="btn btn-secondary">Назад к списку</a>
-</div>
+@section Scripts {
+    <script>
+        // Инициализация Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+}
+
+
 
 
 

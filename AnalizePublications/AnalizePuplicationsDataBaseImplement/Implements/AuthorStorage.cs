@@ -195,6 +195,7 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
             // Среднее количество страниц
             var averagePages = 0.0;
+            var totalPages = 0;
             if (publicationIds.Any())
             {
                 var pagesList = context.Publications
@@ -205,10 +206,62 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 if (pagesList.Any())
                 {
                     averagePages = pagesList.Average();
+                    totalPages = pagesList.Sum();
                 }
             }
 
-            return author.GetViewModel(publicationsCount, coauthorsCount, citationCount, hIndex, averagePages);
+            // i10-индекс (количество публикаций с 10+ цитированиями)
+            var i10Index = 0;
+            if (publicationIds.Any())
+            {
+                i10Index = context.Publications
+                    .Where(p => publicationIds.Contains(p.Id) && p.CitationCount >= 10)
+                    .Count();
+            }
+
+            // Средние цитирования на публикацию
+            var averageCitationsPerPublication = 0.0;
+            if (publicationsCount > 0 && citationCount > 0)
+            {
+                averageCitationsPerPublication = (double)citationCount / publicationsCount;
+            }
+
+            // Индекс продуктивности (количество публикаций / количество лет активности)
+            var productivityIndex = 0.0;
+            if (publicationIds.Any())
+            {
+                var publications = context.Publications
+                    .Where(p => publicationIds.Contains(p.Id) && p.PublicationDate.HasValue)
+                    .Select(p => p.PublicationDate!.Value.Year)
+                    .Distinct()
+                    .ToList();
+
+                var yearsOfActivity = publications.Any() ? publications.Max() - publications.Min() + 1 : 1;
+                if (yearsOfActivity > 0)
+                {
+                    productivityIndex = (double)publicationsCount / yearsOfActivity;
+                }
+            }
+
+            // Максимальное и минимальное количество цитирований
+            var maxCitations = 0;
+            var minCitations = 0;
+            if (publicationIds.Any())
+            {
+                var citations = context.Publications
+                    .Where(p => publicationIds.Contains(p.Id))
+                    .Select(p => p.CitationCount)
+                    .ToList();
+
+                if (citations.Any())
+                {
+                    maxCitations = citations.Max();
+                    minCitations = citations.Min();
+                }
+            }
+
+            return author.GetViewModel(publicationsCount, coauthorsCount, citationCount, hIndex, averagePages,
+                i10Index, averageCitationsPerPublication, totalPages, productivityIndex, maxCitations, minCitations);
         }
     }
 }

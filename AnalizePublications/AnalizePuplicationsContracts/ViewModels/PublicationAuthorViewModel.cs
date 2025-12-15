@@ -15,3 +15,6 @@ namespace AnalyzePublicationsContracts.ViewModels
 
 
 
+
+
+

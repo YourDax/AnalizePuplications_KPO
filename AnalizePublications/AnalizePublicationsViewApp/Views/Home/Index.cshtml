@@ -4,7 +4,7 @@
 
 <div class="text-center mt-5 mb-4">
     <h1 class="display-4">Система анализа публикаций</h1>
-    <p class="lead">Используйте меню ниже, чтобы управлять авторами, публикациями и источниками.</p>
+    <p class="lead">Используйте карточки ниже, чтобы просматривать и искать авторов, публикации и источники.</p>
 </div>
 
 <div class="container">
@@ -15,8 +15,11 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Авторы</h5>
-                    <p class="card-text">Создавайте, редактируйте и удаляйте авторов публикаций.</p>
-                    <a href="/Author/Index" class="btn btn-primary mt-auto">Перейти</a>
+                    <p class="card-text">Просматривайте список авторов, их метрики и детальную информацию.</p>
+                    <div class="mt-auto">
+                        <a href="/Author/Browse" class="btn btn-primary">Просмотр</a>
+                        <a href="/Author/Search" class="btn btn-outline-primary">Поиск</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -26,8 +29,11 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Публикации</h5>
-                    <p class="card-text">Просматривайте, создавайте и редактируйте публикации, связывая их с авторами и источниками.</p>
-                    <a href="/Publication/Index" class="btn btn-success mt-auto">Перейти</a>
+                    <p class="card-text">Просматривайте список публикаций, их детали и информацию об авторах.</p>
+                    <div class="mt-auto">
+                        <a href="/Publication/Browse" class="btn btn-success">Просмотр</a>
+                        <a href="/Publication/Search" class="btn btn-outline-success">Поиск</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -37,8 +43,11 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">Источники</h5>
-                    <p class="card-text">Управляйте источниками публикаций, добавляйте новые ссылки и редактируйте существующие.</p>
-                    <a href="/Source/Index" class="btn btn-warning mt-auto">Перейти</a>
+                    <p class="card-text">Просматривайте список источников публикаций и их детальную информацию.</p>
+                    <div class="mt-auto">
+                        <a href="/Source/Browse" class="btn btn-warning">Просмотр</a>
+                        <a href="/Source/Search" class="btn btn-outline-warning">Поиск</a>
+                    </div>
                 </div>
             </div>
         </div>

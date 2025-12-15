@@ -62,7 +62,8 @@ namespace AnalyzePublicationsDatabaseImplement.Models
         }
 
         // GetViewModel будет вызываться из Storage с вычисленными метриками
-        public AuthorViewModel GetViewModel(int publicationsCount, int coauthorsCount, int citationCount, int hIndex, double averagePages) => new()
+        public AuthorViewModel GetViewModel(int publicationsCount, int coauthorsCount, int citationCount, int hIndex, double averagePages,
+            int i10Index, double averageCitationsPerPublication, int totalPages, double productivityIndex, int maxCitations, int minCitations) => new()
         {
             Id = Id,
             FullName = FullName,
@@ -72,7 +73,13 @@ namespace AnalyzePublicationsDatabaseImplement.Models
             CoauthorsCount = coauthorsCount,
             CitationCount = citationCount,
             HIndex = hIndex,
-            AveragePages = averagePages
+            AveragePages = averagePages,
+            I10Index = i10Index,
+            AverageCitationsPerPublication = averageCitationsPerPublication,
+            TotalPages = totalPages,
+            ProductivityIndex = productivityIndex,
+            MaxCitations = maxCitations,
+            MinCitations = minCitations
         };
     }
 }
