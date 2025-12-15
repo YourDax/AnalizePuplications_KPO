@@ -61,7 +61,7 @@ namespace AnalyzePublicationsWeb.Controllers
             // Применяем сортировку
             publications = SortPublications(publications, sortBy ?? "Title", sortOrder ?? "asc");
             
-            ViewBag.Title = title;
+            ViewBag.SearchTitle = title; // Используем SearchTitle вместо Title, чтобы избежать конфликта с ViewData["Title"]
             ViewBag.DateFrom = dateFrom;
             ViewBag.DateTo = dateTo;
             ViewBag.SourceId = sourceId;

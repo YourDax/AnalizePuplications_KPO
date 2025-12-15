@@ -3,6 +3,7 @@ using AnalyzePublicationsContracts.SearchModels;
 using AnalyzePublicationsContracts.StorageContracts;
 using AnalyzePublicationsContracts.ViewModels;
 using AnalyzePublicationsDatabaseImplement.Models;
+using AnalyzePublicationsDataModels.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnalyzePublicationsDatabaseImplement.Implements
@@ -24,6 +25,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
 
             if (!string.IsNullOrEmpty(model.Name))
                 query = query.Where(x => x.Name.Contains(model.Name));
+            if (model.SourceType.HasValue)
+                query = query.Where(x => x.SourceType == (SourceType)model.SourceType.Value);
 
             return query.Select(x => x.GetViewModel).ToList();
         }

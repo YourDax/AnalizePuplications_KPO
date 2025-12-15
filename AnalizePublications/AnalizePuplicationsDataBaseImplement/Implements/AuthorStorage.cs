@@ -34,6 +34,8 @@ namespace AnalyzePublicationsDatabaseImplement.Implements
                 query = query.Where(x => x.FullName.Contains(model.FullName));
             if (!string.IsNullOrEmpty(model.Affiliation))
                 query = query.Where(x => x.Affiliation.Contains(model.Affiliation));
+            if (!string.IsNullOrEmpty(model.Email))
+                query = query.Where(x => x.Email != null && x.Email.Contains(model.Email));
 
             return query.ToList()
                 .Select(a => CalculateMetricsAndCreateViewModel(context, a))

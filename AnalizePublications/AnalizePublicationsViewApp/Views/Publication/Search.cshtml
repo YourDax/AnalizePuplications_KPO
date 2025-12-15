@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-3">
             <label for="title" class="form-label">Название</label>
-            <input type="text" class="form-control" id="title" name="title" value="@ViewBag.Title" />
+            <input type="text" class="form-control" id="title" name="title" value="@ViewBag.SearchTitle" placeholder="Введите название публикации" />
         </div>
         <div class="col-md-2">
             <label for="dateFrom" class="form-label">Дата от</label>
@@ -47,7 +47,7 @@
         <thead class="table-dark">
             <tr>
                 <th>
-                    <a href="@Url.Action("Search", new { title = ViewBag.Title, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "Title", sortOrder = ViewBag.SortBy == "Title" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                    <a href="@Url.Action("Search", new { title = ViewBag.SearchTitle, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "Title", sortOrder = ViewBag.SortBy == "Title" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
                         Название
                         @if (ViewBag.SortBy == "Title")
                         {
@@ -56,7 +56,7 @@
                     </a>
                 </th>
                 <th>
-                    <a href="@Url.Action("Search", new { title = ViewBag.Title, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "PublicationDate", sortOrder = ViewBag.SortBy == "PublicationDate" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                    <a href="@Url.Action("Search", new { title = ViewBag.SearchTitle, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "PublicationDate", sortOrder = ViewBag.SortBy == "PublicationDate" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
                         Дата публикации
                         @if (ViewBag.SortBy == "PublicationDate")
                         {
@@ -65,7 +65,7 @@
                     </a>
                 </th>
                 <th>
-                    <a href="@Url.Action("Search", new { title = ViewBag.Title, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "PublicationType", sortOrder = ViewBag.SortBy == "PublicationType" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                    <a href="@Url.Action("Search", new { title = ViewBag.SearchTitle, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "PublicationType", sortOrder = ViewBag.SortBy == "PublicationType" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
                         Тип
                         @if (ViewBag.SortBy == "PublicationType")
                         {
@@ -74,7 +74,7 @@
                     </a>
                 </th>
                 <th>
-                    <a href="@Url.Action("Search", new { title = ViewBag.Title, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "Pages", sortOrder = ViewBag.SortBy == "Pages" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                    <a href="@Url.Action("Search", new { title = ViewBag.SearchTitle, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "Pages", sortOrder = ViewBag.SortBy == "Pages" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
                         Страниц
                         @if (ViewBag.SortBy == "Pages")
                         {
@@ -83,7 +83,7 @@
                     </a>
                 </th>
                 <th>
-                    <a href="@Url.Action("Search", new { title = ViewBag.Title, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "CitationCount", sortOrder = ViewBag.SortBy == "CitationCount" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
+                    <a href="@Url.Action("Search", new { title = ViewBag.SearchTitle, dateFrom = ViewBag.DateFrom, dateTo = ViewBag.DateTo, sourceId = ViewBag.SourceId, sortBy = "CitationCount", sortOrder = ViewBag.SortBy == "CitationCount" && ViewBag.SortOrder == "asc" ? "desc" : "asc" })" class="text-white text-decoration-none">
                         Цитирования
                         @if (ViewBag.SortBy == "CitationCount")
                         {
