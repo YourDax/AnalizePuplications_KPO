@@ -146,7 +146,9 @@ namespace AnalyzePublicationsWeb.Controllers
             return View(new AuthorBindingModel
             {
                 Id = author.Id,
-                FullName = author.FullName
+                FullName = author.FullName,
+                Affiliation = author.Affiliation,
+                Email = author.Email
             });
         }
 

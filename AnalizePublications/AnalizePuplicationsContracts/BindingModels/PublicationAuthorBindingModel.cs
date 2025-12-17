@@ -17,3 +17,5 @@ namespace AnalyzePublicationsContracts.BindingModels
 
 
 
+
+
